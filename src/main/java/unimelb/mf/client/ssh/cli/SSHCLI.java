@@ -146,7 +146,7 @@ public abstract class SSHCLI<T extends SSHService> implements BackgroundService.
              * completed
              */
             XmlDoc.Element re = bs.getResult(this.session);
-            List<XmlDoc.Element> fes = re.elements("failed");
+            List<XmlDoc.Element> fes = re.elements();
             if (fes != null) {
                 for (XmlDoc.Element fe : fes) {
                     XmlUtils.print(System.err, fe);
