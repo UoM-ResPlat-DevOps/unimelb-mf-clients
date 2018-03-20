@@ -5,7 +5,7 @@ import java.nio.file.Paths;
 
 public class Applications {
 
-    public static final String APP_NAME = "daris-ssh-client";
+    public static final String APP_NAME = "unimelb-mf-clients";
     public static final Path PROPERTIES_FILE = Paths.get(System.getProperty("user.home"), ".mediaflux",
             APP_NAME + "-properties.xml");
 
