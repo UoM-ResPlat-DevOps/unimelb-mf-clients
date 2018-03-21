@@ -178,8 +178,7 @@ public abstract class SSHCLI<T extends SSHService> implements BackgroundService.
 
     public void printUsage(PrintStream s) {
         s.println();
-        s.println("NAME");
-        s.println(String.format("    %s", appName()));
+        s.println(String.format("Command Manual:    %s", appName()));
         s.println();
         s.println("SYNOPSIS");
         s.println(String.format("    %s <mediaflux-arguments> <%s-arguments>", appName(),
