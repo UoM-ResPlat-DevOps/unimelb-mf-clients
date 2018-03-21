@@ -1,5 +1,7 @@
 package unimelb.mf.client.session;
 
+import java.util.List;
+
 import arc.mf.client.ServerClient;
 import arc.xml.XmlDoc;
 import arc.xml.XmlStringWriter;
@@ -15,7 +17,7 @@ public interface MFService {
 
     }
 
-    default ServerClient.Input input() {
+    default List<ServerClient.Input> inputs() {
         return null;
     }
 
@@ -30,12 +32,12 @@ public interface MFService {
         w.push("service", new String[] { "name", name() });
         serviceArgs(w);
         w.pop();
-        return session.execute("service.execute", w.document(), input(), output()).longValue("id");
+        return session.execute("service.execute", w.document(), inputs(), output()).longValue("id");
     }
 
     default XmlDoc.Element execute(MFSession session) throws Throwable {
         validateArgs();
-        return session.execute(name(), serviceArgs(), input(), output());
+        return session.execute(name(), serviceArgs(), inputs(), output());
     }
 
     default String serviceArgs() throws Throwable {

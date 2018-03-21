@@ -200,7 +200,7 @@ public class BackgroundService extends UserOwnedTask {
     public static void abort(MFSession session, long id) throws Throwable {
         XmlStringWriter w = new XmlStringWriter();
         w.add("id", id);
-        session.execute("service.background.abort", w.document(), null, null);
+        session.execute("service.background.abort", w.document());
     }
 
     /**
@@ -218,14 +218,13 @@ public class BackgroundService extends UserOwnedTask {
     public static void destroy(MFSession session, long id) throws Throwable {
         XmlStringWriter w = new XmlStringWriter();
         w.add("id", id);
-        session.execute("service.background.destroy", w.document(), null, null);
+        session.execute("service.background.destroy", w.document());
     }
 
     public static BackgroundService describe(MFSession session, long id) throws Throwable {
         XmlStringWriter w = new XmlStringWriter();
         w.add("id", id);
-        return new BackgroundService(
-                session.execute("service.background.describe", w.document(), null, null).element("task"));
+        return new BackgroundService(session.execute("service.background.describe", w.document()).element("task"));
     }
 
     public static void describe(MFSession session, long id, StateListener l) throws Throwable {
@@ -235,7 +234,7 @@ public class BackgroundService extends UserOwnedTask {
     public Element getResult(MFSession session) throws Throwable {
         XmlStringWriter w = new XmlStringWriter();
         w.add("id", id());
-        return session.execute("service.background.results.get", w.document(), null, null).element("reply");
+        return session.execute("service.background.results.get", w.document()).element("reply");
     }
 
 }

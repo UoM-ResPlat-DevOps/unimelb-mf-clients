@@ -1,6 +1,7 @@
 package unimelb.mf.client.session;
 
 import java.util.Arrays;
+import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
 
@@ -8,6 +9,7 @@ import arc.mf.client.AuthenticationDetails;
 import arc.mf.client.RemoteServer;
 import arc.mf.client.RequestOptions;
 import arc.mf.client.ServerClient;
+import arc.mf.client.ServerClient.Input;
 import arc.utils.AbortableOperationHandler;
 import arc.utils.CanAbort;
 import arc.xml.XmlDoc;
@@ -77,9 +79,14 @@ public class MFSession {
 
     public XmlDoc.Element execute(String service, String args, ServerClient.Input input, ServerClient.Output output,
             HasAbortableOperation abortable) throws Throwable {
+        return execute(service, args, input == null ? null : Arrays.asList(input), output, abortable);
+    }
+
+    public XmlDoc.Element execute(String service, String args, List<ServerClient.Input> inputs,
+            ServerClient.Output output, HasAbortableOperation abortable) throws Throwable {
         ServerClient.Connection cxn = connect();
         try {
-            return execute(cxn, service, args, input, output, abortable, _settings.executeRetryTimes());
+            return execute(cxn, service, args, inputs, output, abortable, _settings.executeRetryTimes());
         } finally {
             cxn.close();
         }
@@ -96,8 +103,9 @@ public class MFSession {
         }
     }
 
-    private XmlDoc.Element execute(ServerClient.Connection cxn, String service, String args, ServerClient.Input input,
-            ServerClient.Output output, HasAbortableOperation abortable, int retryTimes) throws Throwable {
+    private XmlDoc.Element execute(ServerClient.Connection cxn, String service, String args,
+            List<ServerClient.Input> inputs, ServerClient.Output output, HasAbortableOperation abortable,
+            int retryTimes) throws Throwable {
         try {
             RequestOptions ops = new RequestOptions();
             ops.setAbortHandler(new AbortableOperationHandler() {
@@ -116,7 +124,7 @@ public class MFSession {
                     }
                 }
             });
-            return cxn.executeMultiInput(null, service, args, input == null ? null : Arrays.asList(input), output, ops);
+            return cxn.executeMultiInput(null, service, args, inputs, output, ops);
         } catch (ServerClient.ExSessionInvalid si) {
             if (_auth != null && retryTimes > 0) {
                 System.out.println("Session invalid. Try re-authenticating...");
@@ -124,15 +132,40 @@ public class MFSession {
                     Thread.sleep(_settings.executeRetryInterval());
                 }
                 setSessionId(cxn.connect(_auth));
-                return execute(cxn, service, args, input, output, abortable, --retryTimes);
+                return execute(cxn, service, args, inputs, output, abortable, --retryTimes);
             }
             throw si;
         }
     }
 
+    public XmlDoc.Element execute(String service, String args, List<ServerClient.Input> inputs,
+            ServerClient.Output output) throws Throwable {
+        return execute(service, args, inputs, output, null);
+    }
+
+    public XmlDoc.Element execute(String service, String args, List<ServerClient.Input> inputs) throws Throwable {
+        return execute(service, args, inputs, null, null);
+    }
+
     public XmlDoc.Element execute(String service, String args, ServerClient.Input input, ServerClient.Output output)
             throws Throwable {
         return execute(service, args, input, output, null);
+    }
+
+    public XmlDoc.Element execute(String service, String args, ServerClient.Input input) throws Throwable {
+        return execute(service, args, input, null, null);
+    }
+
+    public XmlDoc.Element execute(String service, String args, ServerClient.Output output) throws Throwable {
+        return execute(service, args, (List<Input>) null, output, null);
+    }
+
+    public XmlDoc.Element execute(String service, String args) throws Throwable {
+        return execute(service, args, (List<Input>) null, null, null);
+    }
+
+    public XmlDoc.Element execute(String service) throws Throwable {
+        return execute(service, null, (List<Input>) null, null, null);
     }
 
     public void discard() {
@@ -155,7 +188,7 @@ public class MFSession {
             @Override
             public void run() {
                 try {
-                    execute("server.ping", null, null, null);
+                    execute("server.ping");
                 } catch (Throwable e) {
                     e.printStackTrace(System.err);
                 }

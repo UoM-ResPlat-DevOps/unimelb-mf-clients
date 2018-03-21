@@ -15,7 +15,7 @@ public class AssetNamespaceUtils {
                 }
                 XmlStringWriter w = new XmlStringWriter();
                 w.add("namespace", ns);
-                session.execute("asset.namespace.create", w.document(), null, null);
+                session.execute("asset.namespace.create", w.document());
             } catch (Throwable e) {
                 String msg = e.getMessage();
                 if (msg != null && (msg.contains("already exists") || msg.contains("not accessible"))) {
@@ -32,6 +32,6 @@ public class AssetNamespaceUtils {
     public static boolean assetNamespaceExists(MFSession session, String ns) throws Throwable {
         XmlStringWriter w = new XmlStringWriter();
         w.add("namespace", ns);
-        return session.execute("asset.namespace.exists", w.document(), null, null).booleanValue("exists");
+        return session.execute("asset.namespace.exists", w.document()).booleanValue("exists");
     }
 }
