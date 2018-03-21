@@ -1,4 +1,4 @@
-package unimelb.mf.client.task;
+package unimelb.mf.model.task;
 
 import java.util.Date;
 import java.util.List;

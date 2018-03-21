@@ -1,4 +1,4 @@
-package unimelb.mf.client.task;
+package unimelb.mf.model.task;
 
 import arc.xml.XmlDoc;
 import unimelb.mf.model.authentication.UserRef;

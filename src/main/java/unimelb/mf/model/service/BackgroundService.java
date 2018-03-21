@@ -6,7 +6,7 @@ import arc.xml.XmlDoc;
 import arc.xml.XmlDoc.Element;
 import arc.xml.XmlStringWriter;
 import unimelb.mf.client.session.MFSession;
-import unimelb.mf.client.task.UserOwnedTask;
+import unimelb.mf.model.task.UserOwnedTask;
 
 public class BackgroundService extends UserOwnedTask {
 

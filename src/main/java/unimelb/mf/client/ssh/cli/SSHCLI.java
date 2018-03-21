@@ -13,9 +13,9 @@ import unimelb.mf.client.session.MFSession;
 import unimelb.mf.client.ssh.SSHService;
 import unimelb.mf.client.ssh.SSHTransferDirection;
 import unimelb.mf.client.ssh.SSHTransferProtocol;
-import unimelb.mf.client.task.Task;
 import unimelb.mf.client.util.XmlUtils;
 import unimelb.mf.model.service.BackgroundService;
+import unimelb.mf.model.task.Task;
 
 public abstract class SSHCLI<T extends SSHService> implements BackgroundService.StateListener {
 
