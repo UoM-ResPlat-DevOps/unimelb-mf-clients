@@ -1,11 +1,8 @@
 ```
-NAME
-    scp-put
-
-SYNOPSIS
+USAGE:
     scp-put <mediaflux-arguments> <scp-arguments>
 
-DESCRIPTION
+DESCRIPTION:
     Export Mediaflux assets to remote SSH server using scp.
 
 MEDIAFLUX ARGUMENTS:
@@ -26,4 +23,8 @@ SCP ARGUMENTS:
     --ssh.private-key <private-key>       SSH user's private key.
     --ssh.passphrase <passphrase>         Passphrase for the SSH user's private key.
     --ssh.directory <dst-directory>       Destination directory on remote SSH server.
+
+EXAMPLES:
+    The command below exports assets from the specified Mediaflux asset namespace to remote scp server:
+        scp-put --mf.host mediaflux.your-domain.org --mf.port 443 --mf.transport 443 --mf.auth mf_domain,mf_user,MF_PASSWD --mf.namespace /path/to/src-namespace --ssh.host ssh-server.your-domain.org --ssh.port 22 --ssh.user ssh_username --ssh.password SSH_PASSWD --ssh.directory path/to/dst-directory
  ```
