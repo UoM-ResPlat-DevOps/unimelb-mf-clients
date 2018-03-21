@@ -1,11 +1,8 @@
 ```
-NAME
-    sftp-get
-
-SYNOPSIS
+USAGE:
     sftp-get <mediaflux-arguments> <sftp-arguments>
 
-DESCRIPTION
+DESCRIPTION:
     Import files from remote SFTP server to Mediaflux using sftp.
 
 MEDIAFLUX ARGUMENTS:
@@ -28,4 +25,8 @@ SFTP ARGUMENTS:
     --ssh.private-key <private-key>       SFTP user's private key.
     --ssh.passphrase <passphrase>         Passphrase for the SFTP user's private key.
     --ssh.path <src-path>                 Source path on remote SFTP server.
+
+EXAMPLES:
+    The command below imports files from sftp server into the specified Mediaflux asset namespace:
+         sftp-get --mf.host mediaflux.your-domain.org --mf.port 443 --mf.transport 443 --mf.auth mf_domain,mf_user,MF_PASSWD --mf.namespace /path/to/dst-namespace --ssh.host ssh-server.your-domain.org --ssh.port 22 --ssh.user ssh_username --ssh.password SSH_PASSWD --ssh.path path/to/src-directory
 ```
