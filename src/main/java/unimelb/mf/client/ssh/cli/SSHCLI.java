@@ -181,7 +181,7 @@ public abstract class SSHCLI<T extends SSHService> implements BackgroundService.
         s.println(String.format("USAGE:    %s <mediaflux-arguments> <%s-arguments>", appName(),
                 sshTransferProtocol().toString()));
         s.println();
-        s.println("DESCRIPTION");
+        s.println("DESCRIPTION:");
         s.println("    " + description());
         s.println();
         s.println("MEDIAFLUX ARGUMENTS:");
