@@ -48,4 +48,14 @@ public abstract class SSHPutCLI<T extends SSHPutService> extends SSHCLI<T> {
         //@formatter:on
     }
 
+    @Override
+    protected void printExamples(PrintStream s) {
+        //@formatter:off
+        s.println(String.format("    The command below exports assets from the specified Mediaflux asset namespace to remote %s server:", sshTransferProtocol()));
+        s.println(String.format("        %s --mf.host mediaflux.your-domain.org --mf.port 443 --mf.transport 443 --mf.auth mf_domain,mf_user,MF_PASSWD --mf.namespace /path/to/src-namespace --ssh.host ssh-server.your-domain.org --ssh.port 22 --ssh.user ssh_username --ssh.password SSH_PASSWD --ssh.directory path/to/dst-directory", appName()));
+        
+        s.println();
+        //@formatter:on
+    }
+
 }

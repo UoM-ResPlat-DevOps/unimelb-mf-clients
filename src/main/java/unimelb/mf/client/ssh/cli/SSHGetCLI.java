@@ -67,4 +67,14 @@ public abstract class SSHGetCLI<T extends SSHGetService> extends SSHCLI<T> {
         s.println(String.format("    --ssh.path <src-path>                 Source path on remote %s server.", protocol));
         //@formatter:on
     }
+
+    @Override
+    protected void printExamples(PrintStream s) {
+        //@formatter:off
+        s.println(String.format("    The command below imports files from %s server into the specified Mediaflux asset namespace:", sshTransferProtocol()));
+        s.println(String.format("         %s --mf.host mediaflux.your-domain.org --mf.port 443 --mf.transport 443 --mf.auth mf_domain,mf_user,MF_PASSWD --mf.namespace /path/to/dst-namespace --ssh.host ssh-server.your-domain.org --ssh.port 22 --ssh.user ssh_username --ssh.password SSH_PASSWD --ssh.path path/to/src-directory", appName()));
+        
+        s.println();
+        //@formatter:on
+    }
 }

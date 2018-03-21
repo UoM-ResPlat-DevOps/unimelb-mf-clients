@@ -178,7 +178,8 @@ public abstract class SSHCLI<T extends SSHService> implements BackgroundService.
 
     public void printUsage(PrintStream s) {
         s.println();
-        s.println(String.format("USAGE:    %s <mediaflux-arguments> <%s-arguments>", appName(),
+        s.println("USAGE:");
+        s.println(String.format("    %s <mediaflux-arguments> <%s-arguments>", appName(),
                 sshTransferProtocol().toString()));
         s.println();
         s.println("DESCRIPTION:");
@@ -189,6 +190,9 @@ public abstract class SSHCLI<T extends SSHService> implements BackgroundService.
         s.println();
         s.println(String.format("%s ARGUMENTS:", sshTransferProtocol().toString().toUpperCase()));
         printSshArgs(s);
+        s.println();
+        s.println("EXAMPLES:");
+        printExamples(s);
     }
 
     protected void printMeidafluxArgs(PrintStream s) {
@@ -213,6 +217,8 @@ public abstract class SSHCLI<T extends SSHService> implements BackgroundService.
         s.println(String.format("    --ssh.passphrase <passphrase>         Passphrase for the %s user's private key.", protocol));
         //@formatter:on
     }
+
+    protected abstract void printExamples(PrintStream s);
 
     private static String formatTime(double durationSeconds) {
         long seconds = (long) durationSeconds;
