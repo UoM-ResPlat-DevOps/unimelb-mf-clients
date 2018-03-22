@@ -1,7 +1,5 @@
 package unimelb.mf.client.ssh.cli;
 
-import java.io.PrintStream;
-
 import unimelb.mf.client.ssh.SCPGetService;
 import unimelb.mf.client.ssh.SSHTransferProtocol;
 
