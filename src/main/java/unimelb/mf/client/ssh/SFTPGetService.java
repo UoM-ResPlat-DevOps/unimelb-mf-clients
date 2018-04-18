@@ -4,7 +4,7 @@ public class SFTPGetService extends SSHGetService {
 
     @Override
     public final String name() {
-        return "daris.sftp.get";
+        return "unimelb.sftp.get";
     }
 
     @Override

@@ -4,7 +4,7 @@ public class SCPGetService extends SSHGetService {
 
     @Override
     public final String name() {
-        return "daris.scp.get";
+        return "unimelb.scp.get";
     }
 
     @Override

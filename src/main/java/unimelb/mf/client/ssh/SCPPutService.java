@@ -4,7 +4,7 @@ public class SCPPutService extends SSHPutService {
 
     @Override
     public final String name() {
-        return "daris.scp.put";
+        return "unimelb.scp.put";
     }
 
     @Override

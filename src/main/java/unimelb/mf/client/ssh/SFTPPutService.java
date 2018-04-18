@@ -4,7 +4,7 @@ public class SFTPPutService extends SSHPutService {
 
     @Override
     public String name() {
-        return "daris.sftp.put";
+        return "unimelb.sftp.put";
     }
 
     @Override
