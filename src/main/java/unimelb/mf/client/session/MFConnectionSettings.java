@@ -1,10 +1,14 @@
 package unimelb.mf.client.session;
 
+import java.io.BufferedInputStream;
 import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileReader;
+import java.io.InputStream;
 import java.io.Reader;
 import java.nio.file.Path;
+import java.util.Properties;
 
 import arc.mf.client.AuthenticationDetails;
 import arc.xml.XmlDoc;
@@ -36,7 +40,7 @@ public class MFConnectionSettings {
     public MFConnectionSettings() throws Throwable {
 
     }
-    
+
     public MFConnectionSettings(Path xmlFile) throws Throwable {
         this(xmlFile.toFile());
     }
@@ -297,6 +301,39 @@ public class MFConnectionSettings {
         }
         if (_token == null && (_domain == null || _user == null || _password == null) && _sessionKey == null) {
             throw new IllegalArgumentException("Missing/Incomplete mf.token or mf.auth");
+        }
+    }
+
+    public void loadFromConfigFile(String configFile) throws Exception {
+        File cf = new File(configFile);
+        Properties props = new Properties();
+        InputStream in = new BufferedInputStream(new FileInputStream(cf));
+        try {
+            props.load(in);
+            if (props.containsKey("host")) {
+                setServerHost(props.getProperty("host"));
+            }
+            if (props.containsKey("port")) {
+                int port = Integer.parseInt(props.getProperty("port"));
+                setServerPort(port);
+            }
+            if (props.containsKey("transport")) {
+                setServerTransport(props.getProperty("transport"));
+            }
+            if (props.containsKey("domain")) {
+                setDomain(props.getProperty("domain"));
+            }
+            if (props.containsKey("user")) {
+                setUser(props.getProperty("user"));
+            }
+            if (props.containsKey("password")) {
+                setPassword(props.getProperty("password"));
+            }
+            if (props.containsKey("token")) {
+                setToken(props.getProperty("token"));
+            }
+        } finally {
+            in.close();
         }
     }
 

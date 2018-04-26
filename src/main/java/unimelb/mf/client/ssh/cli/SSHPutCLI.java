@@ -32,8 +32,8 @@ public abstract class SSHPutCLI<T extends SSHPutService> extends SSHCLI<T> {
         }
     }
 
-    protected void printMeidafluxArgs(PrintStream s) {
-        super.printMeidafluxArgs(s);
+    protected void printMediafluxArgs(PrintStream s) {
+        super.printMediafluxArgs(s);
         //@formatter:off
         s.println("    --mf.namespace <src-namespace>        Source namespace on Mediaflux.");
         s.println("    --mf.unarchive                        Unpack asset contents.");

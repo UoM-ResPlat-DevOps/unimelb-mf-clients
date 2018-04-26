@@ -50,8 +50,8 @@ public abstract class SSHGetCLI<T extends SSHGetService> extends SSHCLI<T> {
         }
     }
 
-    protected void printMeidafluxArgs(PrintStream s) {
-        super.printMeidafluxArgs(s);
+    protected void printMediafluxArgs(PrintStream s) {
+        super.printMediafluxArgs(s);
         //@formatter:off
         s.println("    --mf.namespace <dst-namespace>        Destination namespace on Mediaflux.");
         s.println("    --mf.readonly                         Set the assets to be read-only.");

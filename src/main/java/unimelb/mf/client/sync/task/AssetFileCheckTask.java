@@ -1,4 +1,4 @@
-package unimelb.mf.client.sync;
+package unimelb.mf.client.sync.task;
 
 public class AssetFileCheckTask {
 

@@ -1,4 +1,4 @@
-package unimelb.mf.client.sync;
+package unimelb.mf.client.sync.task;
 
 import java.io.BufferedOutputStream;
 import java.io.File;
@@ -20,13 +20,25 @@ import arc.xml.XmlDoc;
 import arc.xml.XmlDoc.Element;
 import arc.xml.XmlStringWriter;
 import unimelb.mf.client.session.MFSession;
+import unimelb.mf.client.sync.SyncTask;
+import unimelb.mf.client.sync.app.SyncApp;
 import unimelb.mf.client.util.FileUtils;
 import unimelb.mf.client.util.PathUtils;
 
-public class AssetDownloadTask extends AbstractSyncTask {
+public class AssetDownloadTask extends SyncTask {
 
     public static enum Unarchive {
-        AAR, ALL, NONE
+        AAR, ALL, NONE;
+
+        public static Unarchive fromString(String sv) {
+            Unarchive[] vs = values();
+            for (Unarchive v : vs) {
+                if (v.name().equalsIgnoreCase(sv)) {
+                    return v;
+                }
+            }
+            return null;
+        }
     }
 
     private String _assetId;
@@ -35,16 +47,14 @@ public class AssetDownloadTask extends AbstractSyncTask {
     private Path _dstPath;
 
     private Unarchive _unarchive = Unarchive.NONE;
-    // TODO remove _overwrite, let check step decide
-    private boolean _overwrite = false;
 
-    protected AssetDownloadTask(SyncApplication app, String assetPath, Path dstPath) {
+    public AssetDownloadTask(SyncApp<?> app, String assetPath, Path dstPath) {
         super(app);
         _assetPath = assetPath;
         _dstPath = dstPath.toAbsolutePath();
     }
 
-    protected AssetDownloadTask(SyncApplication app, Path dstPath, String assetId) {
+    protected AssetDownloadTask(SyncApp<?> app, Path dstPath, String assetId) {
         super(app);
         _dstPath = dstPath.toAbsolutePath();
         _assetId = assetId;
@@ -83,7 +93,7 @@ public class AssetDownloadTask extends AbstractSyncTask {
                     if (needToUnarchive(ae)) {
                         String ctype = ae.value("content/type");
                         Path dir = Paths.get(PathUtils.removeFileExtension(_dstPath.toString()));
-                        FileUtils.createParentDirectories(dir);
+                        Files.createDirectories(dir);
                         Archive.declareSupportForAllTypes();
                         ArchiveInput ai = ArchiveRegistry.createInput(is, new NamedMimeType(ctype));
                         try {
@@ -95,13 +105,8 @@ public class AssetDownloadTask extends AbstractSyncTask {
                                     } else {
                                         try {
                                             File f = PathUtils.getFile(dir.toString(), e.name());
-                                            if (_overwrite || !f.exists()) {
-                                                logInfo("Extracting file: '" + f.getAbsolutePath() + "'");
-                                                StreamCopy.copy(e.stream(), f);
-                                            } else {
-                                                logWarning(
-                                                        "File: '" + f.getAbsolutePath() + "' already exists. Skipped.");
-                                            }
+                                            logInfo("Extracting file: '" + f.getAbsolutePath() + "'");
+                                            StreamCopy.copy(e.stream(), f);
                                         } finally {
                                             e.stream().close();
                                         }
@@ -114,16 +119,13 @@ public class AssetDownloadTask extends AbstractSyncTask {
                             ai.close();
                         }
                     } else {
-                        if (_overwrite || Files.exists(_dstPath)) {
-                            OutputStream os = new BufferedOutputStream(new FileOutputStream(_dstPath.toFile()));
-                            try {
-                                logInfo("Downloading file: '" + _dstPath + "'");
-                                StreamCopy.copy(is, os);
-                            } finally {
-                                os.close();
-                            }
-                        } else {
-                            logWarning("File: '" + _dstPath + "' already exists. Skipped.");
+                        FileUtils.createParentDirectories(_dstPath);
+                        OutputStream os = new BufferedOutputStream(new FileOutputStream(_dstPath.toFile()));
+                        try {
+                            logInfo("Downloading file: '" + _dstPath + "'");
+                            StreamCopy.copy(is, os);
+                        } finally {
+                            os.close();
                         }
                     }
                 } finally {

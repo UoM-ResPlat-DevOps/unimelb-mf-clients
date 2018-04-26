@@ -186,7 +186,7 @@ public abstract class SSHCLI<T extends SSHService> implements BackgroundService.
         s.println("    " + description());
         s.println();
         s.println("MEDIAFLUX ARGUMENTS:");
-        printMeidafluxArgs(s);
+        printMediafluxArgs(s);
         s.println();
         s.println(String.format("%s ARGUMENTS:", sshTransferProtocol().toString().toUpperCase()));
         printSshArgs(s);
@@ -195,7 +195,7 @@ public abstract class SSHCLI<T extends SSHService> implements BackgroundService.
         printExamples(s);
     }
 
-    protected void printMeidafluxArgs(PrintStream s) {
+    protected void printMediafluxArgs(PrintStream s) {
         //@formatter:off
         s.println("    --mf.host <host>                      Mediaflux server host.");
         s.println("    --mf.port <port>                      Mediaflux server port.");
