@@ -1,4 +1,4 @@
-package unimelb.mf.client.sync.item;
+package unimelb.mf.client.sync.check;
 
 public interface HasContent extends HasLength, HasChecksum {
 

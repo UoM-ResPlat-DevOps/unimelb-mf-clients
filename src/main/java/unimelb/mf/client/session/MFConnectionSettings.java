@@ -300,7 +300,7 @@ public class MFConnectionSettings {
             throw new IllegalArgumentException("Missing mf.transport");
         }
         if (_token == null && (_domain == null || _user == null || _password == null) && _sessionKey == null) {
-            throw new IllegalArgumentException("Missing/Incomplete mf.token or mf.auth");
+            throw new IllegalArgumentException("Missing/Incomplete mf.token or mf.auth.");
         }
     }
 

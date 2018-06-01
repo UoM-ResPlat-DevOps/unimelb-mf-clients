@@ -8,78 +8,64 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
-import java.util.ListIterator;
 
 import unimelb.mf.client.session.MFSession;
+import unimelb.mf.client.sync.check.CheckHandler;
+import unimelb.mf.client.sync.task.AssetDownloadTask;
+import unimelb.mf.client.task.MFApp;
 import unimelb.mf.client.util.AssetNamespaceUtils;
 
-public abstract class Settings {
+public class Settings implements MFApp.Settings {
 
     public static final int DEFAULT_DAEMON_LISTENER_PORT = 9761;
-    public static final int DEFAULT_MAX_WORKERS = 1;
-    public static final int DEFAULT_QUERY_RESULT_PAGE_SIZE = 1000;
+    public static final long DEFAULT_DAEMON_SCAN_INTERVAL = 60000L;
+    public static final int DEFAULT_NUM_OF_QUERIERS = 1;
+    public static final int DEFAULT_NUM_OF_WORKERS = 1;
+    public static final int DEFAULT_BATCH_SIZE = 1000;
+    public static final int DEFAULT_NUM_OF_RETRIES = 0;
 
-    private Action _action;
-    private Direction _direction;
     private List<Job> _jobs;
     private Path _logDir = Paths.get(System.getProperty("java.io.tmpdir"));
 
-    private int _nbWorkers = DEFAULT_MAX_WORKERS;
+    private int _nbQueriers = DEFAULT_NUM_OF_QUERIERS;
+    private int _nbWorkers = DEFAULT_NUM_OF_WORKERS;
 
     private boolean _daemon = false;
     private int _daemonListenerPort = DEFAULT_DAEMON_LISTENER_PORT;
+    private long _daemonScanInterval = DEFAULT_DAEMON_SCAN_INTERVAL;
 
-    private int _queryResultPageSize = DEFAULT_QUERY_RESULT_PAGE_SIZE;
+    private int _batchSize = DEFAULT_BATCH_SIZE;
 
-    protected Settings(Action action, Direction direction, List<Job> jobs) {
-        _action = action;
-        _direction = direction;
+    private boolean _csumCheck;
+
+    private int _retry = DEFAULT_NUM_OF_RETRIES; // Number of retries...
+
+    /*
+     * download settings
+     */
+    private boolean _overwrite = false;
+    private AssetDownloadTask.Unarchive _unarchive = AssetDownloadTask.Unarchive.NONE;
+
+    /*
+     * check settings
+     */
+    private CheckHandler _checkHandler = null;
+
+    private boolean _verbose = false;
+
+    public Settings() {
         _jobs = new ArrayList<Job>();
-        if (jobs != null) {
-            _jobs.addAll(jobs);
+    }
+
+    public int batchSize() {
+        return _batchSize;
+    }
+
+    public void setBatchSize(int batchSize) {
+        if (batchSize < 1) {
+            batchSize = DEFAULT_BATCH_SIZE;
         }
-    }
-
-    public Action action() {
-        return _action;
-    }
-
-    protected void setAction(Action action) {
-        if (action != null) {
-            if (action != _action) {
-                _action = action;
-                // Make the job actions be consistent.
-                if (_jobs != null && !_jobs.isEmpty()) {
-                    for (ListIterator<Job> it = _jobs.listIterator(); it.hasNext();) {
-                        Job job = it.next();
-                        it.remove();
-                        it.add(new Job(_action, _direction, job.directory(), job.namespace(),
-                                job.isDestinationParent()));
-                    }
-                }
-            }
-        }
-    }
-
-    public Direction direction() {
-        return _direction;
-    }
-
-    protected void setDirection(Direction direction) {
-        if (direction != null) {
-            if (direction != _direction) {
-                _direction = direction;
-                // Make the job actions be consistent.
-                if (_jobs != null && !_jobs.isEmpty()) {
-                    for (ListIterator<Job> it = _jobs.listIterator(); it.hasNext();) {
-                        Job job = it.next();
-                        it.remove();
-                        it.add(new Job(_action, _direction, job.directory(), job.namespace(),
-                                job.isDestinationParent()));
-                    }
-                }
-            }
-        }
+        _batchSize = batchSize;
     }
 
     public Path logDirectory() {
@@ -97,24 +83,13 @@ public abstract class Settings {
         return null;
     }
 
-    public void addJob(Path dir, String ns, boolean isDestinationParent) {
-        addJob(new Job(action(), direction(), dir, ns, isDestinationParent));
-    }
-
     public void addJob(Job... jobs) {
         if (_jobs == null) {
             _jobs = new ArrayList<Job>();
         }
         if (jobs != null && jobs.length > 0) {
             for (Job job : jobs) {
-                if (job.action() != action() || job.direction() != direction()) {
-                    // NOTE: the job's action must be consistent with the
-                    // settings' action.
-                    _jobs.add(new Job(action(), direction(), job.directory(), job.namespace(),
-                            job.isDestinationParent()));
-                } else {
-                    _jobs.add(job);
-                }
+                _jobs.add(job);
             }
         }
     }
@@ -162,15 +137,15 @@ public abstract class Settings {
         }
     }
 
-    public int queryResultPageSize() {
-        return _queryResultPageSize;
+    public int numberOfQueriers() {
+        return _nbQueriers;
     }
 
-    public void setQueryResultPageSize(int pageSize) {
-        if (pageSize < 1) {
-            _queryResultPageSize = 1;
+    public void setNumberOfQueriers(int nbQueriers) {
+        if (nbQueriers <= 1) {
+            _nbQueriers = 1;
         } else {
-            _queryResultPageSize = pageSize;
+            _nbQueriers = nbQueriers;
         }
     }
 
@@ -197,6 +172,110 @@ public abstract class Settings {
                 throw new IllegalArgumentException("'" + job.directory() + "' is not a directory.");
             }
         }
+    }
+
+    public boolean csumCheck() {
+        return _csumCheck;
+    }
+
+    public void setCsumCheck(boolean csumCheck) {
+        _csumCheck = csumCheck;
+    }
+
+    /**
+     * Currently for download only.
+     * 
+     * @return
+     */
+    public boolean overwrite() {
+        return _overwrite;
+    }
+
+    /**
+     * Currently for download only.
+     * 
+     * @param overwrite
+     */
+    public void setOverwrite(boolean overwrite) {
+        _overwrite = overwrite;
+    }
+
+    /**
+     * Currently for download only.
+     * 
+     * @return
+     */
+    public AssetDownloadTask.Unarchive unarchive() {
+        return _unarchive;
+    }
+
+    /**
+     * Currently for download only.
+     * 
+     * @param unarchive
+     */
+    public void setUnarchive(AssetDownloadTask.Unarchive unarchive) {
+        _unarchive = unarchive;
+    }
+
+    /**
+     * For check only.
+     * 
+     * @return
+     */
+    public CheckHandler checkHandler() {
+        return _checkHandler;
+    }
+
+    /**
+     * For check only.
+     * 
+     * @param ch
+     */
+    public void setCheckHandler(CheckHandler ch) {
+        _checkHandler = ch;
+    }
+
+    public int retry() {
+        return _retry;
+    }
+
+    public void setRetry(int retry) {
+        if (retry < 0) {
+            _retry = 0;
+        }
+        _retry = retry;
+    }
+
+    public boolean verbose() {
+        return _verbose;
+    }
+
+    public void setVerbose(boolean verbose) {
+        _verbose = verbose;
+    }
+
+    public long daemonScanInterval() {
+        return _daemonScanInterval;
+    }
+
+    public void setDaemonScanInterval(long interval) {
+        _daemonScanInterval = interval;
+    }
+
+    public boolean hasJobs() {
+        return _jobs != null && !_jobs.isEmpty();
+    }
+
+    public boolean hasOnlyCheckJobs() {
+        if (hasJobs()) {
+            for (Job job : _jobs) {
+                if (job.action().type() != Action.Type.CHECK) {
+                    return false;
+                }
+            }
+        }
+        return true;
     }
 
 }

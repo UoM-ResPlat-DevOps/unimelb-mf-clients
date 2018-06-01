@@ -2,14 +2,31 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="50600ddf-b98e-44fa-9dc5-823659976664" name="Default" comment="">
-      <change beforePath="$PROJECT_DIR$/src/main/java/unimelb/mf/client/sync/job/AbstractJob.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/unimelb/mf/client/sync/job/CheckJob.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/unimelb/mf/client/sync/job/DownloadJob.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/unimelb/mf/client/sync/job/Job.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/unimelb/mf/client/sync/job/TransferJob.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/unimelb/mf/client/sync/job/UploadJob.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/unimelb/mf/client/sync/SyncTask.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/unimelb/mf/client/sync/app/AbstractSyncApp.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/unimelb/mf/client/task/AbstractMFApp.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/unimelb/mf/client/sync/app/MFCheckApp.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/unimelb/mf/client/sync/app/MFCheckApp.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/unimelb/mf/client/sync/app/MFDownloadApp.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/unimelb/mf/client/sync/app/MFDownloadApp.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/unimelb/mf/client/sync/app/MFUploadApp.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/unimelb/mf/client/sync/app/MFUploadApp.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/unimelb/mf/client/sync/app/SyncApp.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/unimelb/mf/client/task/MFApp.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/unimelb/mf/client/sync/check/Comparable.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/unimelb/mf/client/sync/cli/SyncCLI.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/unimelb/mf/client/sync/cli/SyncCLI.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/unimelb/mf/client/sync/item/AssetItem.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/unimelb/mf/client/sync/check/AssetItem.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/unimelb/mf/client/sync/item/ChecksumType.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/unimelb/mf/client/sync/check/ChecksumType.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/unimelb/mf/client/sync/item/FileItem.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/unimelb/mf/client/sync/check/FileItem.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/unimelb/mf/client/sync/item/HasChecksum.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/unimelb/mf/client/sync/check/HasChecksum.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/unimelb/mf/client/sync/item/HasContent.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/unimelb/mf/client/sync/check/HasContent.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/unimelb/mf/client/sync/item/HasContextPath.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/unimelb/mf/client/sync/check/HasContextPath.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/unimelb/mf/client/sync/item/HasLength.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/unimelb/mf/client/sync/check/HasLength.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/unimelb/mf/client/sync/item/Item.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/unimelb/mf/client/sync/check/Item.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/unimelb/mf/client/sync/settings/Job.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/unimelb/mf/client/sync/settings/Job.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/unimelb/mf/client/sync/settings/Type.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/unimelb/mf/client/sync/settings/Type.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/unimelb/mf/client/sync/settings/MFCheckSettings.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/unimelb/mf/client/sync/settings/MFCheckSettings.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/unimelb/mf/client/sync/settings/Settings.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/unimelb/mf/client/sync/settings/Settings.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/unimelb/mf/client/sync/task/AssetDownloadTask.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/unimelb/mf/client/sync/task/AssetDownloadTask.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/unimelb/mf/client/sync/task/AssetFileCheckTask.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/unimelb/mf/client/sync/task/AssetSetCheckTask.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/unimelb/mf/client/sync/task/FileAssetCheckTask.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/unimelb/mf/client/sync/task/FileSetCheckTask.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/unimelb/mf/client/task/AbstractMFTask.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/unimelb/mf/client/task/AbstractMFTask.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/unimelb/mf/client/task/MFTask.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/unimelb/mf/client/task/MFTask.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/unimelb/mf/client/util/ChecksumUtils.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/unimelb/mf/client/util/ChecksumUtils.java" afterDir="false" />
     </list>
     <ignored path="$PROJECT_DIR$/target/" />
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
@@ -20,31 +37,12 @@
     <option name="LAST_RESOLUTION" value="IGNORE" />
   </component>
   <component name="FileEditorManager">
-    <leaf>
-      <file leaf-file-name="AbstractSettings.java" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/main/java/unimelb/mf/client/sync/settings/AbstractSettings.java">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="60">
-              <caret line="8" column="22" selection-start-line="8" selection-start-column="22" selection-end-line="8" selection-end-column="22" />
-            </state>
-          </provider>
-        </entry>
-      </file>
+    <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
       <file leaf-file-name="Job.java" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/src/main/java/unimelb/mf/client/sync/settings/Job.java">
           <provider selected="true" editor-type-id="text-editor">
             <state relative-caret-position="60">
-              <caret line="4" column="13" selection-start-line="4" selection-start-column="13" selection-end-line="4" selection-end-column="13" />
-              <folding>
-                <element signature="e#408#409#0" expanded="true" />
-                <element signature="e#436#437#0" expanded="true" />
-                <element signature="e#475#476#0" expanded="true" />
-                <element signature="e#501#502#0" expanded="true" />
-                <element signature="e#538#539#0" expanded="true" />
-                <element signature="e#565#566#0" expanded="true" />
-                <element signature="e#615#616#0" expanded="true" />
-                <element signature="e#647#648#0" expanded="true" />
-              </folding>
+              <caret line="4" selection-start-line="4" selection-end-line="4" />
             </state>
           </provider>
         </entry>
@@ -62,15 +60,14 @@
       </list>
     </option>
   </component>
-  <component name="ProjectFrameBounds" extendedState="6">
-    <option name="x" value="47" />
-    <option name="y" value="37" />
-    <option name="width" value="2466" />
-    <option name="height" value="1334" />
+  <component name="ProjectFrameBounds">
+    <option name="y" value="23" />
+    <option name="width" value="2560" />
+    <option name="height" value="1362" />
   </component>
   <component name="ProjectLevelVcsManager" settingsEditedManually="true" />
   <component name="ProjectView">
-    <navigator currentView="PackagesPane" proportions="" version="1">
+    <navigator proportions="" version="1">
       <foldersAlwaysOnTop value="true" />
     </navigator>
     <panes>
@@ -111,7 +108,6 @@
           <select />
         </subPane>
       </pane>
-      <pane id="AndroidView" />
       <pane id="ProjectPane">
         <subPane>
           <expand>
@@ -124,6 +120,7 @@
         </subPane>
       </pane>
       <pane id="Scope" />
+      <pane id="AndroidView" />
     </panes>
   </component>
   <component name="RunDashboard">
@@ -196,31 +193,30 @@
   </component>
   <component name="ToolWindowManager">
     <frame x="0" y="23" width="2560" height="1362" extended-state="6" />
-    <editor active="true" />
     <layout>
-      <window_info anchor="right" id="Palette" />
+      <window_info anchor="right" id="Palette" order="3" />
       <window_info anchor="bottom" id="TODO" order="6" />
-      <window_info anchor="right" id="Palette&#9;" />
-      <window_info id="Image Layers" />
-      <window_info anchor="right" id="Capture Analysis" />
-      <window_info anchor="bottom" id="Event Log" side_tool="true" />
-      <window_info anchor="right" id="Maven Projects" />
+      <window_info anchor="right" id="Palette&#9;" order="3" />
+      <window_info id="Image Layers" order="2" />
+      <window_info anchor="right" id="Capture Analysis" order="3" />
+      <window_info anchor="bottom" id="Event Log" order="7" side_tool="true" />
+      <window_info anchor="right" id="Maven Projects" order="3" />
       <window_info anchor="bottom" id="Run" order="2" />
-      <window_info anchor="bottom" id="Version Control" />
-      <window_info anchor="bottom" id="Terminal" />
-      <window_info id="Capture Tool" />
-      <window_info id="Designer" />
+      <window_info anchor="bottom" id="Version Control" order="7" />
+      <window_info anchor="bottom" id="Terminal" order="7" />
+      <window_info id="Capture Tool" order="2" />
+      <window_info id="Designer" order="2" />
       <window_info active="true" content_ui="combo" id="Project" order="0" visible="true" weight="0.13671875" />
       <window_info id="Structure" order="1" side_tool="true" weight="0.25" />
       <window_info anchor="right" id="Ant Build" order="1" weight="0.25" />
-      <window_info id="UI Designer" />
-      <window_info anchor="right" id="Theme Preview" />
+      <window_info id="UI Designer" order="2" />
+      <window_info anchor="right" id="Theme Preview" order="3" />
       <window_info anchor="bottom" id="Debug" order="3" weight="0.4" />
-      <window_info id="Favorites" side_tool="true" />
-      <window_info anchor="bottom" id="Find" order="1" />
-      <window_info anchor="right" id="Commander" internal_type="SLIDING" order="0" type="SLIDING" weight="0.4" />
-      <window_info anchor="bottom" id="Inspection" order="5" weight="0.4" />
+      <window_info id="Favorites" order="2" side_tool="true" />
       <window_info anchor="right" content_ui="combo" id="Hierarchy" order="2" weight="0.25" />
+      <window_info anchor="bottom" id="Inspection" order="5" weight="0.4" />
+      <window_info anchor="right" id="Commander" internal_type="SLIDING" order="0" type="SLIDING" weight="0.4" />
+      <window_info anchor="bottom" id="Find" order="1" />
       <window_info anchor="bottom" id="Cvs" order="4" weight="0.25" />
       <window_info anchor="bottom" id="Message" order="0" />
     </layout>
@@ -229,83 +225,26 @@
     <option name="myLimit" value="2678400000" />
   </component>
   <component name="editorHistoryManager">
-    <entry file="file://$PROJECT_DIR$/src/main/java/unimelb/mf/client/sync/settings/job/TransferJob.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="60">
-          <caret line="4" column="22" selection-start-line="4" selection-start-column="22" selection-end-line="4" selection-end-column="22" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/java/unimelb/mf/client/sync/settings/job/UploadJob.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="225">
-          <caret line="17" lean-forward="true" selection-start-line="17" selection-end-line="17" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/java/unimelb/mf/client/sync/AbstractSyncTask.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="60">
-          <caret line="4" column="22" selection-start-line="4" selection-start-column="22" selection-end-line="4" selection-end-column="22" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/java/unimelb/mf/client/sync/AssetFileCheckTask.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="30">
-          <caret line="2" column="13" selection-start-line="2" selection-start-column="13" selection-end-line="2" selection-end-column="13" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/java/unimelb/mf/client/sync/AssetDownloadTask.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="90">
-          <caret line="27" column="32" selection-start-line="27" selection-start-column="23" selection-end-line="27" selection-end-column="32" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/java/unimelb/mf/client/sync/settings/job/AbstractJob.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="60">
-          <caret line="4" column="22" selection-start-line="4" selection-start-column="22" selection-end-line="4" selection-end-column="22" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/java/unimelb/mf/client/sync/settings/AbstractSettings.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="60">
-          <caret line="8" column="22" selection-start-line="8" selection-start-column="22" selection-end-line="8" selection-end-column="22" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/java/unimelb/mf/client/sync/settings/job/CheckJob.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="60">
-          <caret line="4" column="22" selection-start-line="4" selection-start-column="22" selection-end-line="4" selection-end-column="22" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/java/unimelb/mf/client/sync/settings/job/Job.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="60">
-          <caret line="4" column="17" selection-start-line="4" selection-start-column="17" selection-end-line="4" selection-end-column="17" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/src/main/java/unimelb/mf/client/sync/settings/Job.java">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="60">
-          <caret line="4" column="13" selection-start-line="4" selection-start-column="13" selection-end-line="4" selection-end-column="13" />
-          <folding>
-            <element signature="e#408#409#0" expanded="true" />
-            <element signature="e#436#437#0" expanded="true" />
-            <element signature="e#475#476#0" expanded="true" />
-            <element signature="e#501#502#0" expanded="true" />
-            <element signature="e#538#539#0" expanded="true" />
-            <element signature="e#565#566#0" expanded="true" />
-            <element signature="e#615#616#0" expanded="true" />
-            <element signature="e#647#648#0" expanded="true" />
-          </folding>
+          <caret line="4" lean-forward="true" selection-start-line="4" selection-end-line="4" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/java/unimelb/mf/client/sync/settings/job/TransferJob.java" />
+    <entry file="file://$PROJECT_DIR$/src/main/java/unimelb/mf/client/sync/settings/job/UploadJob.java" />
+    <entry file="file://$PROJECT_DIR$/src/main/java/unimelb/mf/client/sync/AbstractSyncTask.java" />
+    <entry file="file://$PROJECT_DIR$/src/main/java/unimelb/mf/client/sync/AssetFileCheckTask.java" />
+    <entry file="file://$PROJECT_DIR$/src/main/java/unimelb/mf/client/sync/AssetDownloadTask.java" />
+    <entry file="file://$PROJECT_DIR$/src/main/java/unimelb/mf/client/sync/settings/job/AbstractJob.java" />
+    <entry file="file://$PROJECT_DIR$/src/main/java/unimelb/mf/client/sync/settings/AbstractSettings.java" />
+    <entry file="file://$PROJECT_DIR$/src/main/java/unimelb/mf/client/sync/settings/job/CheckJob.java" />
+    <entry file="file://$PROJECT_DIR$/src/main/java/unimelb/mf/client/sync/settings/job/Job.java" />
+    <entry file="file://$PROJECT_DIR$/src/main/java/unimelb/mf/client/sync/settings/Job.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="60">
+          <caret line="4" selection-start-line="4" selection-end-line="4" />
         </state>
       </provider>
     </entry>

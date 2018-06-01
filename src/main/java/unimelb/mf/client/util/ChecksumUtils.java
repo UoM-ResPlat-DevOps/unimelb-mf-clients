@@ -72,6 +72,10 @@ public class ChecksumUtils {
         }
         return cin.getChecksum().getValue();
     }
+    
+    public static String getCRC32(Path f) throws Throwable {
+        return getCRC32(f.toFile());
+    }
 
     public static String getCRC32(File f) throws Throwable {
         InputStream in = new BufferedInputStream(new FileInputStream(f));

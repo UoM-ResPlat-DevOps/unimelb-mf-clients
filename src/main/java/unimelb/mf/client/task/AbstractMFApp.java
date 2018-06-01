@@ -1,19 +1,16 @@
-package unimelb.mf.client.sync.app;
+package unimelb.mf.client.task;
 
 import java.util.logging.Logger;
 
 import unimelb.mf.client.session.MFSession;
-import unimelb.mf.client.sync.settings.Settings;
 
-public abstract class AbstractSyncApp<T extends Settings> implements SyncApp<T> {
+public abstract class AbstractMFApp<T extends MFApp.Settings> implements MFApp<T> {
 
     private MFSession _session;
-    private T _settings;
     private Logger _logger;
 
-    protected AbstractSyncApp(T settings) {
-        _settings = settings;
-        assert _settings != null;
+    protected AbstractMFApp() {
+
     }
 
     @Override
@@ -24,11 +21,6 @@ public abstract class AbstractSyncApp<T extends Settings> implements SyncApp<T> 
     @Override
     public MFSession session() {
         return _session;
-    }
-
-    @Override
-    public T settings() {
-        return _settings;
     }
 
     @Override

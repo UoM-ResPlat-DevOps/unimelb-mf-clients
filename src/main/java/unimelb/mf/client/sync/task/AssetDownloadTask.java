@@ -8,6 +8,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
+import java.util.logging.Logger;
 
 import arc.archive.ArchiveInput;
 import arc.archive.ArchiveRegistry;
@@ -15,17 +16,19 @@ import arc.mf.client.ServerClient;
 import arc.mf.client.archive.Archive;
 import arc.mime.NamedMimeType;
 import arc.streams.LongInputStream;
+import arc.streams.SizedInputStream;
 import arc.streams.StreamCopy;
 import arc.xml.XmlDoc;
 import arc.xml.XmlDoc.Element;
 import arc.xml.XmlStringWriter;
+import unimelb.io.ProgressMonitor;
+import unimelb.io.ProgressMonitorInputStream;
 import unimelb.mf.client.session.MFSession;
-import unimelb.mf.client.sync.SyncTask;
-import unimelb.mf.client.sync.app.SyncApp;
+import unimelb.mf.client.task.AbstractMFTask;
 import unimelb.mf.client.util.FileUtils;
 import unimelb.mf.client.util.PathUtils;
 
-public class AssetDownloadTask extends SyncTask {
+public class AssetDownloadTask extends AbstractMFTask {
 
     public static enum Unarchive {
         AAR, ALL, NONE;
@@ -48,16 +51,22 @@ public class AssetDownloadTask extends SyncTask {
 
     private Unarchive _unarchive = Unarchive.NONE;
 
-    public AssetDownloadTask(SyncApp<?> app, String assetPath, Path dstPath) {
-        super(app);
+    private DataTransferListener<String, Path> _dl;
+
+    public AssetDownloadTask(MFSession session, Logger logger, String assetPath, Path dstPath,
+            DataTransferListener<String, Path> dl) {
+        super(session, logger);
         _assetPath = assetPath;
         _dstPath = dstPath.toAbsolutePath();
+        _dl = dl;
     }
 
-    protected AssetDownloadTask(SyncApp<?> app, Path dstPath, String assetId) {
-        super(app);
+    protected AssetDownloadTask(MFSession session, Logger logger, Path dstPath, String assetId,
+            DataTransferListener<String, Path> dl) {
+        super(session, logger);
         _dstPath = dstPath.toAbsolutePath();
         _assetId = assetId;
+        _dl = dl;
     }
 
     public String assetPath() {
@@ -69,12 +78,13 @@ public class AssetDownloadTask extends SyncTask {
     }
 
     @Override
-    public void execute(MFSession session) throws Throwable {
+    public void execute() throws Throwable {
 
         ServerClient.Output output = new ServerClient.OutputConsumer() {
 
             @Override
             protected void consume(Element re, LongInputStream is) throws Throwable {
+
                 XmlDoc.Element ae = re.element("asset");
                 if (_assetPath == null) {
                     _assetPath = ae.value("path");
@@ -89,22 +99,36 @@ public class AssetDownloadTask extends SyncTask {
                     logWarning("Asset " + _assetId + ": '" + _assetPath + "' content stream is null.");
                     return;
                 }
+                boolean unarchive = needToUnarchive(ae);
+                Path dstDir = unarchive ? Paths.get(PathUtils.removeFileExtension(_dstPath.toString())) : null;
+                ProgressMonitorInputStream pis = new ProgressMonitorInputStream(is, new ProgressMonitor() {
+                    @Override
+                    public void progressed(long bytesRead) {
+                        if (_dl != null) {
+                            _dl.transferProgressed(_assetPath, unarchive ? dstDir : _dstPath, bytesRead);
+                        }
+                    }
+                });
+                SizedInputStream sis = new SizedInputStream(pis, is.length());
                 try {
-                    if (needToUnarchive(ae)) {
+                    if (unarchive) {
                         String ctype = ae.value("content/type");
-                        Path dir = Paths.get(PathUtils.removeFileExtension(_dstPath.toString()));
-                        Files.createDirectories(dir);
+
+                        if (_dl != null) {
+                            _dl.transferStarted(_assetPath, dstDir);
+                        }
+                        Files.createDirectories(dstDir);
                         Archive.declareSupportForAllTypes();
-                        ArchiveInput ai = ArchiveRegistry.createInput(is, new NamedMimeType(ctype));
+                        ArchiveInput ai = ArchiveRegistry.createInput(sis, new NamedMimeType(ctype));
                         try {
                             ArchiveInput.Entry e = null;
                             while ((e = ai.next()) != null) {
                                 try {
                                     if (e.isDirectory()) {
-                                        Files.createDirectories(PathUtils.getPath(dir.toString(), e.name()));
+                                        Files.createDirectories(PathUtils.getPath(dstDir.toString(), e.name()));
                                     } else {
                                         try {
-                                            File f = PathUtils.getFile(dir.toString(), e.name());
+                                            File f = PathUtils.getFile(dstDir.toString(), e.name());
                                             logInfo("Extracting file: '" + f.getAbsolutePath() + "'");
                                             StreamCopy.copy(e.stream(), f);
                                         } finally {
@@ -120,23 +144,39 @@ public class AssetDownloadTask extends SyncTask {
                         }
                     } else {
                         FileUtils.createParentDirectories(_dstPath);
+                        if (_dl != null) {
+                            _dl.transferStarted(_assetPath, _dstPath);
+                        }
                         OutputStream os = new BufferedOutputStream(new FileOutputStream(_dstPath.toFile()));
                         try {
                             logInfo("Downloading file: '" + _dstPath + "'");
-                            StreamCopy.copy(is, os);
+                            StreamCopy.copy(sis, os);
                         } finally {
                             os.close();
                         }
                     }
+                    if (_dl != null) {
+                        _dl.transferCompleted(_assetPath, unarchive ? dstDir : _dstPath);
+                    }
+                } catch (Throwable t) {
+                    if (_dl != null) {
+                        _dl.transferFailed(_assetPath, unarchive ? dstDir : _dstPath);
+                    }
+                    throw t;
                 } finally {
-                    is.close();
+                    try {
+                        sis.close();
+                    } finally {
+                        pis.close();
+                    }
                 }
             }
         };
 
         XmlStringWriter w = new XmlStringWriter();
         w.add("id", _assetId != null ? _assetId : ("path=" + _assetPath));
-        session.execute("asset.get", w.document(), (List<ServerClient.Input>) null, output, this);
+
+        session().execute("asset.get", w.document(), (List<ServerClient.Input>) null, output, this);
     }
 
     private boolean needToUnarchive(XmlDoc.Element ae) throws Throwable {

@@ -21,13 +21,13 @@ public abstract class AbstractMFTask implements MFTask {
     }
 
     @Override
-    public Logger logger() {
-        return _logger;
+    public MFSession session() {
+        return _session;
     }
 
     @Override
-    public MFSession session() {
-        return _session;
+    public Logger logger() {
+        return _logger;
     }
 
     @Override
@@ -73,6 +73,32 @@ public abstract class AbstractMFTask implements MFTask {
 
     protected void setCurrentOperation(String currentOperation) {
         _currentOp = currentOperation;
+    }
+
+    @Override
+    public final Void call() throws Exception {
+        try {
+            execute();
+            return null;
+        } catch (Throwable e) {
+            logError(e);
+            if (e instanceof InterruptedException) {
+                Thread.currentThread().interrupt();
+                CanAbort ca = abortableOperation();
+                if (ca != null) {
+                    try {
+                        ca.abort();
+                    } catch (Throwable e1) {
+                        logError("Fail to abort service call.", e1);
+                    }
+                }
+            }
+            if (e instanceof Exception) {
+                throw (Exception) e;
+            } else {
+                throw new Exception(e.getMessage(), e);
+            }
+        }
     }
 
 }
