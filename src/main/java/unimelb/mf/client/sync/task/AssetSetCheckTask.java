@@ -56,7 +56,7 @@ public class AssetSetCheckTask extends AbstractMFTask {
                         _rh.checked(new CheckResult(ai, file, true, true, false, false));
                     }
                 } else {
-                    _rh.checked(new CheckResult(ai, file, false, true,
+                    _rh.checked(new CheckResult(ai, file, true, true,
                             ai.length() >= 0 && ai.length() == Files.size(file), null));
                 }
             } else {

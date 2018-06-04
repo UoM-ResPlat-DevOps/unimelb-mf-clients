@@ -38,6 +38,7 @@ public class CheckResult {
         _srcPath = srcPath;
         _dstType = dstType;
         _dstPath = dstPath;
+        _dstExists = dstExists;
         _namesMatch = namesMatch;
         _sizesMatch = sizesMatch;
         _checksumsMatch = checksumsMatch;

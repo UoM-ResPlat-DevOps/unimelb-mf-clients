@@ -8,6 +8,7 @@ import java.nio.file.Paths;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.logging.FileHandler;
 import java.util.logging.Formatter;
+import java.util.logging.Handler;
 import java.util.logging.Level;
 import java.util.logging.LogRecord;
 import java.util.logging.Logger;
@@ -93,7 +94,7 @@ public class DefaultCheckHandler implements CheckHandler {
             System.out.println(String.format("    %,13d files [checked/total]", nbCheckedFiles));
             System.out.println(String.format("    %,13d files [passed]", numberOfPassedFiles()));
             System.out.println(String.format("    %,13d files [missing]", numberOfMissingFiles()));
-            System.out.println(String.format("    %,13d files [content mismatch]", numberOfMissingFiles()));
+            System.out.println(String.format("    %,13d files [content mismatch]", numberOfContentMismatchFiles()));
             System.out.println();
         }
         int nbCheckedAssets = numberOfCheckedAssets();
@@ -101,7 +102,7 @@ public class DefaultCheckHandler implements CheckHandler {
             System.out.println(String.format("    %,13d assets [checked/total]", nbCheckedAssets));
             System.out.println(String.format("    %,13d assets [passed]", numberOfPassedAssets()));
             System.out.println(String.format("    %,13d assets [missing]", numberOfMissingAssets()));
-            System.out.println(String.format("    %,13d assets [content mismatch]", numberOfMissingAssets()));
+            System.out.println(String.format("    %,13d assets [content mismatch]", numberOfContentMismatchAssets()));
             System.out.println();
         }
     }
@@ -175,6 +176,17 @@ public class DefaultCheckHandler implements CheckHandler {
 
     public int numberOfContentMismatchAssets() {
         return _nbAssetContentMismatch.get();
+    }
+
+    public void close() throws IOException {
+        if (_csvLogger != null) {
+            Handler[] handlers = _csvLogger.getHandlers();
+            if (handlers != null) {
+                for (Handler handler : handlers) {
+                    handler.close();
+                }
+            }
+        }
     }
 
     public static Logger createCsvLogger(Path dir, String fileName) throws Throwable {

@@ -17,7 +17,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
-import java.util.concurrent.Callable;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.ThreadPoolExecutor;
@@ -272,18 +271,18 @@ public class MFSyncApp extends AbstractMFApp<unimelb.mf.client.sync.settings.Set
         ps.println();
         int totalFiles = _nbUploadedFiles.get() + _nbSkippedFiles.get() + _nbFailedFiles.get();
         if (totalFiles > 0) {
-            ps.println(String.format("    Uploaded: %,32d files", _nbUploadedFiles.get()));
-            ps.println(String.format("     Skipped: %,32d files", _nbSkippedFiles.get()));
-            ps.println(String.format("      Failed: %,32d files", _nbFailedFiles.get()));
-            ps.println(String.format("    Uploaded: %,32d bytes", _nbUploadedBytes.get()));
+            ps.println(String.format("    Uploaded files: %,32d files", _nbUploadedFiles.get()));
+            ps.println(String.format("     Skipped files: %,32d files", _nbSkippedFiles.get()));
+            ps.println(String.format("      Failed files: %,32d files", _nbFailedFiles.get()));
+            ps.println(String.format("    Uploaded bytes: %,32d bytes", _nbUploadedBytes.get()));
             ps.println();
         }
         int totalAssets = _nbDownloadedAssets.get() + _nbSkippedAssets.get() + _nbFailedAssets.get();
         if (totalAssets > 0) {
-            ps.println(String.format("  Downloaded: %,32d files", _nbDownloadedAssets.get()));
-            ps.println(String.format("     Skipped: %,32d files", _nbSkippedAssets.get()));
-            ps.println(String.format("      Failed: %,32d files", _nbFailedAssets.get()));
-            ps.println(String.format("  Downloaded: %,32d bytes", _nbDownloadedBytes.get()));
+            ps.println(String.format("  Downloaded assets: %,32d files", _nbDownloadedAssets.get()));
+            ps.println(String.format("     Skipped assets: %,32d files", _nbSkippedAssets.get()));
+            ps.println(String.format("      Failed assets: %,32d files", _nbFailedAssets.get()));
+            ps.println(String.format("  Downloaded  bytes: %,32d bytes", _nbDownloadedBytes.get()));
             ps.println();
         }
     }
@@ -341,51 +340,36 @@ public class MFSyncApp extends AbstractMFApp<unimelb.mf.client.sync.settings.Set
     }
 
     private void submitDownloadCheckJob(Job job) throws Throwable {
-        _queriers.submit(new Callable<Void>() {
-            @Override
-            public Void call() throws Exception {
-                try {
-                    int idx = 1;
-                    boolean completed = false;
-                    do {
-                        XmlStringWriter w = new XmlStringWriter();
-                        w.add("where", "namespace>='" + job.namespace() + "' and asset has content");
-                        w.add("action", "get-value");
-                        w.add("size", settings().batchSize());
-                        w.add("idx", idx);
-                        w.add("xpath", new String[] { "ename", "path" },
-                                "string.format('%s/%s', xvalue('namespace'), choose(equals(xvalue('name'),null()), string.format('__asset_id__%s',xvalue('@id')),xvalue('name')))");
-                        w.add("xpath", new String[] { "ename", "csize" }, "content/size");
-                        w.add("xpath", new String[] { "ename", "csum" }, "content/csum");
-                        w.add("xpath", new String[] { "ename", "mtime" },
-                                "meta/" + PosixAttributes.DOC_TYPE + "/mtime");
-                        XmlDoc.Element re = session().execute("asset.query", w.document());
-                        List<XmlDoc.Element> aes = re.elements("asset");
-                        if (aes != null && !aes.isEmpty()) {
-                            List<AssetItem> ais = new ArrayList<AssetItem>(aes.size());
-                            for (XmlDoc.Element ae : aes) {
-                                String assetPath = ae.value("path");
-                                long assetContentSize = ae.longValue("csize", -1);
-                                String assetCsum = ae.value("csum");
-                                AssetItem ai = new AssetItem(assetPath, job.namespace(), assetContentSize, assetCsum,
-                                        ChecksumType.CRC32);
-                                ais.add(ai);
-                            }
-                            _queriers.submit(new AssetSetCheckTask(session(), logger(), ais, job,
-                                    settings().csumCheck(), settings().checkHandler(), _queriers));
-                        }
-                        completed = re.longValue("cursor/remaining") == 0;
-                    } while (!completed && !Thread.interrupted());
-                } catch (InterruptedException e) {
-                    Thread.currentThread().interrupt();
-                    logger().info("Interrupted '" + Thread.currentThread().getName() + "' thread(id="
-                            + Thread.currentThread().getId() + ").");
-                } catch (Throwable e) {
-                    logger().log(Level.SEVERE, e.getMessage(), e);
+        int idx = 1;
+        boolean completed = false;
+        do {
+            XmlStringWriter w = new XmlStringWriter();
+            w.add("where", "namespace>='" + job.namespace() + "' and asset has content");
+            w.add("action", "get-value");
+            w.add("size", settings().batchSize());
+            w.add("idx", idx);
+            w.add("xpath", new String[] { "ename", "path" },
+                    "string.format('%s/%s', xvalue('namespace'), choose(equals(xvalue('name'),null()), string.format('__asset_id__%s',xvalue('@id')),xvalue('name')))");
+            w.add("xpath", new String[] { "ename", "csize" }, "content/size");
+            w.add("xpath", new String[] { "ename", "csum" }, "content/csum");
+            w.add("xpath", new String[] { "ename", "mtime" }, "meta/" + PosixAttributes.DOC_TYPE + "/mtime");
+            XmlDoc.Element re = session().execute("asset.query", w.document());
+            List<XmlDoc.Element> aes = re.elements("asset");
+            if (aes != null && !aes.isEmpty()) {
+                List<AssetItem> ais = new ArrayList<AssetItem>(aes.size());
+                for (XmlDoc.Element ae : aes) {
+                    String assetPath = ae.value("path");
+                    long assetContentSize = ae.longValue("csize", -1);
+                    String assetCsum = ae.value("csum");
+                    AssetItem ai = new AssetItem(assetPath, job.namespace(), assetContentSize, assetCsum,
+                            ChecksumType.CRC32);
+                    ais.add(ai);
                 }
-                return null;
+                _queriers.submit(new AssetSetCheckTask(session(), logger(), ais, job, settings().csumCheck(),
+                        settings().checkHandler(), _workers));
             }
-        });
+            completed = re.longValue("cursor/remaining") == 0;
+        } while (!completed && !Thread.interrupted());
     }
 
     private void submitUploadCheckJob(Job job) throws Throwable {
@@ -466,6 +450,7 @@ public class MFSyncApp extends AbstractMFApp<unimelb.mf.client.sync.settings.Set
                     String assetPath = ae.value("path");
                     long assetContentSize = ae.longValue("csize", -1);
                     if (assetContentSize < 0) {
+                        _nbSkippedAssets.getAndIncrement();
                         logger().info("Skipped asset " + assetId + ": '" + assetPath + "' No asset content found.");
                         continue;
                     }
@@ -477,11 +462,13 @@ public class MFSyncApp extends AbstractMFApp<unimelb.mf.client.sync.settings.Set
                             long assetPosixMTime = ae.longValue("mtime", -1);
                             if (fileSize == assetContentSize && assetPosixMTime > 0
                                     && assetPosixMTime == fileAttrs.mtime()) {
+                                _nbSkippedAssets.getAndIncrement();
                                 logger().info("Skipped asset " + assetId + ": '" + assetPath
                                         + "' Already exists. Both file sizes and mtimes match.");
                                 continue;
                             }
                         } else {
+                            _nbSkippedAssets.getAndIncrement();
                             logger().info(
                                     "Skipped asset " + assetId + ": '" + assetPath + "' Already exists. No overwrite.");
                             continue;

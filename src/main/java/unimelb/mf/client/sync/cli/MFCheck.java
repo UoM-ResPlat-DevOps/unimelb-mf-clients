@@ -8,6 +8,7 @@ import java.util.Date;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Set;
+import java.util.logging.Level;
 
 import unimelb.mf.client.session.MFConnectionSettings;
 import unimelb.mf.client.session.MFSession;
@@ -146,7 +147,7 @@ public class MFCheck extends MFSyncApp {
         Set<Path> dirs = _dirNamespaces.keySet();
         for (Path dir : dirs) {
             String ns = _dirNamespaces.get(dir);
-            if (AssetNamespaceUtils.assetNamespaceExists(session, ns)) {
+            if (!AssetNamespaceUtils.assetNamespaceExists(session, ns)) {
                 throw new IllegalArgumentException("Asset namespace: '" + ns + "' does not exist.");
             }
             Job job = new Job(Action.get(Action.Type.CHECK, _direction), dir, ns);
@@ -199,15 +200,11 @@ public class MFCheck extends MFSyncApp {
             return 2;
         } else if ("--output".equalsIgnoreCase(args[i]) || "-o".equalsIgnoreCase(args[i])) {
             _outputFile = Paths.get(args[i + 1]);
-            if (Files.exists(_outputFile)) {
-                _outputFile = renameOutputCsvFile(_outputFile, false);
-            } else {
-                Path dir = _outputFile.toAbsolutePath().getParent();
-                if (!Files.exists(dir)) {
-                    Files.createDirectories(dir);
-                }
-                _outputFile = renameOutputCsvFile(_outputFile, false);
+            Path dir = _outputFile.toAbsolutePath().getParent();
+            if (!Files.exists(dir)) {
+                Files.createDirectories(dir);
             }
+            _outputFile = renameOutputCsvFile(_outputFile);
             return 2;
         } else if ("--no-csum-check".equalsIgnoreCase(args[i])) {
             settings().setCsumCheck(false);
@@ -275,25 +272,36 @@ public class MFCheck extends MFSyncApp {
     @Override
     protected void postExecute() {
         super.postExecute();
-        _checkHandler.writeSummary();
-        _checkHandler.printSummary();
+        try {
+            _checkHandler.writeSummary();
+            _checkHandler.printSummary();
+        } finally {
+            try {
+                _checkHandler.close();
+            } catch (Throwable e) {
+                logger().log(Level.SEVERE, e.getMessage(), e);
+            }
+        }
     }
 
-    private static Path renameOutputCsvFile(Path f, boolean appendTimestamp) {
+    private static Path renameOutputCsvFile(Path file) {
+        Path f = file;
         String dir = f.toAbsolutePath().getParent().toString();
         String name = f.getFileName().toString();
+        if (!name.toLowerCase().endsWith(".csv")) {
+            return renameOutputCsvFile(Paths.get(dir, name + ".csv"));
+        }
         String timestamp = new SimpleDateFormat("yyyyMMddHHmmss").format(new Date());
         StringBuilder sb = new StringBuilder();
-        if (name.toLowerCase().endsWith(".csv")) {
+        if (Files.exists(f)) {
             sb.append(name.substring(0, name.length() - 4));
-        } else {
-            sb.append(name);
-        }
-        if (appendTimestamp) {
             sb.append("-").append(timestamp);
+            sb.append(".csv");
+            return Paths.get(dir, sb.toString());
+        } else {
+            return file;
         }
-        sb.append(".csv");
-        return Paths.get(dir, name);
+
     }
 
     public static void main(String[] args) throws Throwable {
