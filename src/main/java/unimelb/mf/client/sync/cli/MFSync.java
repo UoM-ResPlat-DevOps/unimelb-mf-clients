@@ -288,6 +288,11 @@ public class MFSync extends MFSyncApp {
         }
     }
 
+    @Override
+    public final String applicationName() {
+        return PROG;
+    }
+
     public static void main(String[] args) throws Throwable {
         MFSync app = new MFSync();
         try {

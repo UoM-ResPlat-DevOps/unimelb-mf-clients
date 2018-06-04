@@ -315,4 +315,9 @@ public class MFCheck extends MFSyncApp {
         app.execute();
     }
 
+    @Override
+    public final String applicationName() {
+        return PROG;
+    }
+
 }

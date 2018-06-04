@@ -284,6 +284,11 @@ public class MFUpload extends MFSyncApp {
         }
     }
 
+    @Override
+    public final String applicationName() {
+        return PROG;
+    }
+
     public static void main(String[] args) throws Throwable {
         MFUpload app = new MFUpload();
         try {

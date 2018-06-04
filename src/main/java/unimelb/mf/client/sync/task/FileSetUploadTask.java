@@ -2,7 +2,7 @@ package unimelb.mf.client.sync.task;
 
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.Collection;
+import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -51,7 +51,7 @@ public class FileSetUploadTask extends AbstractMFTask {
         setTotalOperations(_assetFiles.size());
         logger().info("Checking " + _assetFiles.size() + " files...");
         XmlStringWriter w1 = new XmlStringWriter();
-        Collection<String> assetPaths = _fileAssets.values();
+        List<String> assetPaths = new ArrayList<String>(_fileAssets.values());
         for (String assetPath : assetPaths) {
             w1.add("id", "path=" + assetPath);
         }
@@ -59,8 +59,9 @@ public class FileSetUploadTask extends AbstractMFTask {
 
         int nbExists = 0;
         XmlStringWriter w2 = new XmlStringWriter();
-        for (XmlDoc.Element ee : ees) {
-            String assetPath = ee.value("@id").replaceFirst("^path=", "");
+        for (int i = 0; i < ees.size(); i++) {
+            XmlDoc.Element ee = ees.get(i);
+            String assetPath = assetPaths.get(i);
             boolean exists = ee.booleanValue();
             if (!exists) {
                 _workers.submit(new FileUploadTask(session(), logger(), _assetFiles.get(assetPath), assetPath,
@@ -89,7 +90,7 @@ public class FileSetUploadTask extends AbstractMFTask {
                     if (_ul != null) {
                         _ul.transferSkipped(file, assetPath);
                     }
-                    logger().info("Asset " + assetPath + " already exists.");
+                    logger().info("Asset '" + assetPath + "' already exists. Skipped.");
                 }
                 incCompletedOperations();
 

@@ -290,6 +290,11 @@ public class MFDownload extends MFSyncApp {
         }
     }
 
+    @Override
+    public final String applicationName() {
+        return PROG;
+    }
+
     public static void main(String[] args) throws Throwable {
         MFDownload app = new MFDownload();
         try {

@@ -38,9 +38,7 @@ import unimelb.mf.client.sync.task.FileSetCheckTask;
 import unimelb.mf.client.sync.task.FileSetUploadTask;
 import unimelb.mf.client.task.AbstractMFApp;
 
-public class MFSyncApp extends AbstractMFApp<unimelb.mf.client.sync.settings.Settings> {
-
-    public static final String APP_NAME = "unimelb-mf-sync";
+public abstract class MFSyncApp extends AbstractMFApp<unimelb.mf.client.sync.settings.Settings> {
 
     private unimelb.mf.client.sync.settings.Settings _settings;
     private ThreadPoolExecutor _workers;
@@ -124,11 +122,6 @@ public class MFSyncApp extends AbstractMFApp<unimelb.mf.client.sync.settings.Set
                 _nbDownloadedBytes.getAndAdd(increment);
             }
         };
-    }
-
-    @Override
-    public final String applicationName() {
-        return APP_NAME;
     }
 
     @Override
@@ -262,7 +255,7 @@ public class MFSyncApp extends AbstractMFApp<unimelb.mf.client.sync.settings.Set
                         logger().log(Level.SEVERE, e.getMessage(), e);
                     }
                 }
-            }, APP_NAME.toLowerCase() + ".daemon.listener");
+            }, applicationName().toLowerCase() + ".daemon.listener");
             _daemonListener.start();
         }
     }
@@ -470,7 +463,7 @@ public class MFSyncApp extends AbstractMFApp<unimelb.mf.client.sync.settings.Set
                         } else {
                             _nbSkippedAssets.getAndIncrement();
                             logger().info(
-                                    "Skipped asset " + assetId + ": '" + assetPath + "' Already exists. No overwrite.");
+                                    "Skipped asset " + assetId + ": '" + assetPath + "' Already exists. Skipped.");
                             continue;
                         }
                     }
