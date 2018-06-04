@@ -2,7 +2,7 @@ package unimelb.mf.client.sync.task;
 
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.Collection;
+import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -55,7 +55,7 @@ public class FileSetCheckTask extends AbstractMFTask {
         setTotalOperations(_assetFiles.size());
         logger().info("Checking " + _assetFiles.size() + " files...");
         XmlStringWriter w1 = new XmlStringWriter();
-        Collection<String> assetPaths = _fileAssets.values();
+        List<String> assetPaths = new ArrayList<String>(_fileAssets.values());
         for (String assetPath : assetPaths) {
             w1.add("id", "path=" + assetPath);
         }
@@ -63,8 +63,9 @@ public class FileSetCheckTask extends AbstractMFTask {
 
         int nbExists = 0;
         XmlStringWriter w2 = new XmlStringWriter();
-        for (XmlDoc.Element ee : ees) {
-            String assetPath = ee.value("@id").replaceFirst("^path=", "");
+        for (int i = 0; i < ees.size(); i++) {
+            XmlDoc.Element ee = ees.get(i);
+            String assetPath = assetPaths.get(i);
             boolean exists = ee.booleanValue();
             if (!exists) {
                 _rh.checked(new CheckResult(_assetFiles.get(assetPath), assetPath, false, false, false,
@@ -90,7 +91,7 @@ public class FileSetCheckTask extends AbstractMFTask {
                 Path file = _assetFiles.get(assetPath);
 
                 if (contentSize == null || contentCsum == null) {
-                    _rh.checked(new CheckResult(ai, file, false, false, false, _csumCheck ? false : null));
+                    _rh.checked(new CheckResult(file, ai.assetPath(), false, false, false, _csumCheck ? false : null));
                     incCompletedOperations();
                     return;
                 }
@@ -102,12 +103,12 @@ public class FileSetCheckTask extends AbstractMFTask {
 
                                 @Override
                                 public void processChecksum(Path file, String checksum, ChecksumType checksumType) {
-                                    _rh.checked(new CheckResult(ai, file, true, true, fileSizesMatch,
+                                    _rh.checked(new CheckResult(file, ai.assetPath(), true, true, fileSizesMatch,
                                             contentCsum.equalsIgnoreCase(checksum)));
                                 }
                             }));
                 } else {
-                    _rh.checked(new CheckResult(ai, file, true, true, contentSize == Files.size(file), null));
+                    _rh.checked(new CheckResult( file, ai.assetPath(), true, true, contentSize == Files.size(file), null));
                 }
                 incCompletedOperations();
 

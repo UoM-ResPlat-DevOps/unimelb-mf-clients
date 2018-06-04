@@ -109,7 +109,7 @@ public class PathUtils {
 	}
 
 	public static String getRelativePathSI(Path parent, Path descendant) {
-		return getRelativePathSI(parent.toAbsolutePath(), descendant.toAbsolutePath());
+		return getRelativePathSI(parent.toAbsolutePath().toString(), descendant.toAbsolutePath().toString());
 	}
 
 	public static String getRelativePathSI(String parent, String descendant) {

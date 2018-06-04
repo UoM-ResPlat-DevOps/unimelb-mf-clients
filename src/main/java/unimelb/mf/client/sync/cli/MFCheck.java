@@ -301,7 +301,6 @@ public class MFCheck extends MFSyncApp {
         } else {
             return file;
         }
-
     }
 
     public static void main(String[] args) throws Throwable {
