@@ -12,7 +12,7 @@ import java.util.logging.Level;
 
 import unimelb.mf.client.session.MFConnectionSettings;
 import unimelb.mf.client.session.MFSession;
-import unimelb.mf.client.sync.app.MFSyncApp;
+import unimelb.mf.client.sync.MFSyncApp;
 import unimelb.mf.client.sync.check.DefaultCheckHandler;
 import unimelb.mf.client.sync.settings.Action;
 import unimelb.mf.client.sync.settings.Job;
@@ -47,12 +47,13 @@ public class MFCheck extends MFSyncApp {
 
     protected void printUsage() {
         // @formatter:off
-        System.out.println("");
+        System.out.println();
         System.out.println("USAGE:");
-        System.out.println(String.format(
-                "    %s [OPTIONS] --direction <up|down|both> --output <output.csv> <dir1> <namespace1> [<dir2> <namespace2>...]",
-                PROG));
-        System.out.println("");
+        System.out.println(String.format("    %s [OPTIONS] --direction <up|down|both> --output <output.csv> <dir1> <namespace1> [<dir2> <namespace2>...]", PROG));
+        System.out.println();
+        System.out.println("DESCRIPTION:");
+        System.out.println("    Compare files in local diretory with assets in remote asset namespace.");
+        System.out.println();
         System.out.println("OPTIONS:");
         System.out.println("    --mf.config <mflux.cfg>                   Path to the config file that contains Mediaflux server details and user credentials.");
         System.out.println("    --mf.host <host>                          Mediaflux server host.");
@@ -60,7 +61,6 @@ public class MFCheck extends MFSyncApp {
         System.out.println("    --mf.transport <https|http|tcp/ip>        Mediaflux server transport, can be http, https or tcp/ip.");
         System.out.println("    --mf.auth <domain,user,password>          Mediaflux user credentials.");
         System.out.println("    --mf.token <token>                        Mediaflux secure identity token.");
-
         System.out.println("    --direction <up|down|both>                Direction(up/down/both).");
         System.out.println("    -o, --output <output.csv>                 Output CSV file.");
         System.out.println("    --detailed-output                         Include all files checked. Otherwise, only the missing or invalid files are included in the output.");
@@ -70,12 +70,14 @@ public class MFCheck extends MFSyncApp {
         System.out.println("    --nb-retries <n>                          Retry times when error occurs. Defaults to " + unimelb.mf.client.sync.settings.Settings.DEFAULT_NUM_OF_RETRIES);
         System.out.println("    --batch-size <size>                       Size of the query result. Defaults to " + unimelb.mf.client.sync.settings.Settings.DEFAULT_BATCH_SIZE);
         System.out.println("    --quiet                                   Do not print progress messages.");
-        
-        System.out.println("");
+        System.out.println();
         System.out.println("POSITIONAL ARGUMENTS:");
         System.out.println("    <dir>                                     Local directory path.");
         System.out.println("    <namespace>                               Remote Mediaflux namespace path.");
-        System.out.println("");
+        System.out.println();
+        System.out.println("EXAMPLES:");
+        System.out.println(String.format("    %s --mf.config ~/.Arcitecta/mflux.cfg --direction down --output ~/Documents/foo-download-check.csv ~/Documents/foo /projects/proj-1.2.3/foo", PROG));
+        System.out.println();
         // @formatter:on
     }
 

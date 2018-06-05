@@ -9,7 +9,7 @@ import java.util.Set;
 
 import unimelb.mf.client.session.MFConnectionSettings;
 import unimelb.mf.client.session.MFSession;
-import unimelb.mf.client.sync.app.MFSyncApp;
+import unimelb.mf.client.sync.MFSyncApp;
 import unimelb.mf.client.sync.settings.Action;
 import unimelb.mf.client.sync.settings.Job;
 import unimelb.mf.client.util.AssetNamespaceUtils;
@@ -46,9 +46,10 @@ public class MFUpload extends MFSyncApp {
         // @formatter:off
         System.out.println();
         System.out.println("USAGE:");
-        System.out.println(String.format(
-                "    %s [OPTIONS] --namespace <dst-namespace> <src-dir1> [<src-dir2>...]",
-                PROG));
+        System.out.println(String.format("    %s [OPTIONS] --namespace <dst-namespace> <src-dir1> [<src-dir2>...]", PROG));
+        System.out.println();
+        System.out.println("DESCRIPTION:");
+        System.out.println("    Upload local files to Mediaflux.");
         System.out.println();
         System.out.println("OPTIONS:");
         System.out.println("    --mf.config <mflux.cfg>                   Path to the config file that contains Mediaflux server details and user credentials.");
@@ -71,6 +72,9 @@ public class MFUpload extends MFSyncApp {
         System.out.println();
         System.out.println("POSITIONAL ARGUMENTS:");
         System.out.println("    <src-dir>                                 Source directory to upload.");
+        System.out.println();
+        System.out.println("EXAMPLES:");
+        System.out.println(String.format("    %s --mf.config ~/.Arcitecta/mflux.cfg --nb-queriers 2 --nb-workers 4  --namespace /projects/proj-1128.1.59 ~/Documents/foo ~/Documents/bar", PROG));
         System.out.println();
         // @formatter:on
     }

@@ -8,7 +8,7 @@ import java.util.Set;
 
 import unimelb.mf.client.session.MFConnectionSettings;
 import unimelb.mf.client.session.MFSession;
-import unimelb.mf.client.sync.app.MFSyncApp;
+import unimelb.mf.client.sync.MFSyncApp;
 import unimelb.mf.client.sync.settings.Action;
 import unimelb.mf.client.sync.settings.Job;
 import unimelb.mf.client.sync.task.AssetDownloadTask.Unarchive;
@@ -46,11 +46,12 @@ public class MFDownload extends MFSyncApp {
 
     protected void printUsage() {
         // @formatter:off
-        System.out.println("");
+        System.out.println();
         System.out.println("USAGE:");
-        System.out.println(String.format(
-                "    %s [OPTIONS] --out <dst-dir> <namespace1> [<namespace2>...]",
-                PROG));
+        System.out.println(String.format("    %s [OPTIONS] --out <dst-dir> <namespace1> [<namespace2>...]", PROG));
+        System.out.println();
+        System.out.println("DESCRIPTION:");
+        System.out.println("    Download data from Mediaflux.");
         System.out.println();
         System.out.println("OPTIONS:");
         System.out.println("    --mf.config <mflux.cfg>                   Path to the config file that contains Mediaflux server details and user credentials.");
@@ -75,7 +76,10 @@ public class MFDownload extends MFSyncApp {
         System.out.println("    --quiet                                   Do not print progress messages.");
         System.out.println();
         System.out.println("POSITIONAL ARGUMENTS:");
-        System.out.println("    <namespace>                               Remote Mediaflux namespace to be downloaded.");
+        System.out.println("    <namespace>                               The asset namespace to download.");
+        System.out.println();
+        System.out.println("EXAMPLES:");
+        System.out.println(String.format("    %s --mf.config ~/.Arcitecta/mflux.cfg --nb-workers 2  --out ~/Downloads /projects/proj-1128.1.59/foo /projects/proj-1128.1.59/bar", PROG));
         System.out.println();
         // @formatter:on
     }

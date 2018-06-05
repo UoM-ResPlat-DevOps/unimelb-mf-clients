@@ -1,4 +1,4 @@
-package unimelb.mf.client.sync.app;
+package unimelb.mf.client.sync;
 
 import java.io.BufferedReader;
 import java.io.IOException;

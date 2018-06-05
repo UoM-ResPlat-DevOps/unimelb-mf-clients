@@ -10,7 +10,7 @@ import java.util.Set;
 
 import unimelb.mf.client.session.MFConnectionSettings;
 import unimelb.mf.client.session.MFSession;
-import unimelb.mf.client.sync.app.MFSyncApp;
+import unimelb.mf.client.sync.MFSyncApp;
 import unimelb.mf.client.sync.settings.Action;
 import unimelb.mf.client.sync.settings.Job;
 import unimelb.mf.client.util.AssetNamespaceUtils;
@@ -49,9 +49,10 @@ public class MFSync extends MFSyncApp {
         // @formatter:off
         System.out.println();
         System.out.println("USAGE:");
-        System.out.println(String.format(
-                "    %s [OPTIONS] <dir1> <namespace1> [<dir2> <namespace2>]",
-                PROG));
+        System.out.println(String.format("    %s [OPTIONS] <dir1> <namespace1> [<dir2> <namespace2>]", PROG));
+        System.out.println();
+        System.out.println("DESCRIPTION:");
+        System.out.println("    Synchronize local directory with remote asset namespace.");
         System.out.println();
         System.out.println("OPTIONS:");
         System.out.println("    --mf.config <mflux.cfg>                   Path to the config file that contains Mediaflux server details and user credentials.");
@@ -74,6 +75,8 @@ public class MFSync extends MFSyncApp {
         System.out.println("POSITIONAL ARGUMENTS:");
         System.out.println("    <dir>                                     Local directory path.");
         System.out.println("    <namespace>                               Corresponding remote asset namespace path.");
+        System.out.println();
+        System.out.println(String.format("    %s --mf.config ~/.Arcitecta/mflux.cfg --nb-queriers 2 --nb-workers 4 ~/Documents/foo /projects/proj-1128.1.59/foo", PROG));
         System.out.println();
         // @formatter:on
     }
