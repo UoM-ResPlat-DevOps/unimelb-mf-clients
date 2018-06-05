@@ -86,7 +86,7 @@ public class CheckResult {
 
     public final String toCSVRecord() {
         StringBuilder sb = new StringBuilder();
-        sb.append(String.format("%s:%s,%s:%s,", srcType(), srcPath(), dstType(), dstPath()));
+        sb.append(String.format("\"%s:%s\",\"%s:%s\",", srcType(), srcPath(), dstType(), dstPath()));
         sb.append(exists()).append(",");
         sb.append(contentsMatch()).append(",");
         return sb.toString();
