@@ -26,6 +26,7 @@ OPTIONS:
     --log-dir <dir>                           Path to the directory for log files. No logging if not specified.
     --notify <email-addresses>                When completes, send email notification to the recipients(comma-separated email addresses if multiple). Not applicable for daemon mode.
     --quiet                                   Do not print progress messages.
+    --help                                    Prints usage.
 
 POSITIONAL ARGUMENTS:
     <namespace>                               The asset namespace to download.

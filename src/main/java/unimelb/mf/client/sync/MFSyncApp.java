@@ -265,7 +265,9 @@ public abstract class MFSyncApp extends AbstractMFApp<unimelb.mf.client.sync.set
                                 }
                             }
                         } catch (SocketException se) {
-                            // logger().info("Listening socket closed!");
+                            if (settings().verbose()) {
+                                logger().info("Listening socket closed!");
+                            }
                         } finally {
                             _daemonListenerSocket.close();
                         }

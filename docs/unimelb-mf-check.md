@@ -21,6 +21,7 @@ OPTIONS:
     --nb-retries <n>                          Retry times when error occurs. Defaults to 0
     --batch-size <size>                       Size of the query result. Defaults to 1000
     --quiet                                   Do not print progress messages.
+    --help                                    Prints usage.
 
 POSITIONAL ARGUMENTS:
     <dir>                                     Local directory path.

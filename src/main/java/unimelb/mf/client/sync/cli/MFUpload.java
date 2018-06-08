@@ -71,6 +71,7 @@ public class MFUpload extends MFSyncApp {
         System.out.println("    --log-dir <dir>                           Path to the directory for log files. No logging if not specified.");
         System.out.println("    --notify <email-addresses>                When completes, send email notification to the recipients(comma-separated email addresses if multiple). Not applicable for daemon mode.");
         System.out.println("    --quiet                                   Do not print progress messages.");
+        System.out.println("    --help                                    Prints usage.");
         System.out.println();
         System.out.println("POSITIONAL ARGUMENTS:");
         System.out.println("    <src-dir>                                 Source directory to upload.");
