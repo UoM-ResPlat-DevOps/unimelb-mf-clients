@@ -52,7 +52,7 @@ public class MFCheck extends MFSyncApp {
         System.out.println(String.format("    %s [OPTIONS] --direction <up|down|both> --output <output.csv> <dir1> <namespace1> [<dir2> <namespace2>...]", PROG));
         System.out.println();
         System.out.println("DESCRIPTION:");
-        System.out.println("    Compare files in local diretory with assets in remote asset namespace.");
+        System.out.println("    Compare files in local directory with assets in remote Mediaflux asset namespace and generates a list of the differences.");
         System.out.println();
         System.out.println("OPTIONS:");
         System.out.println("    --mf.config <mflux.cfg>                   Path to the config file that contains Mediaflux server details and user credentials.");
@@ -64,7 +64,7 @@ public class MFCheck extends MFSyncApp {
         System.out.println("    --direction <up|down|both>                Direction(up/down/both).");
         System.out.println("    -o, --output <output.csv>                 Output CSV file.");
         System.out.println("    --detailed-output                         Include all files checked. Otherwise, only the missing or invalid files are included in the output.");
-        System.out.println("    --no-csum-check                           Do not generate and compare CRC32 checksum.");
+        System.out.println("    --no-csum-check                           Files are equated if the name, size and CRC32 checksum are the same. With this argument, you can exclude the CRC32 checksum comparison.");
         System.out.println("    --nb-queriers <n>                         Number of query threads. Defaults to " + unimelb.mf.client.sync.settings.Settings.DEFAULT_NUM_OF_QUERIERS);
         System.out.println("    --nb-workers <n>                          Number of concurrent worker threads to read local file (to generate checksum) if needed. Defaults to " + unimelb.mf.client.sync.settings.Settings.DEFAULT_NUM_OF_WORKERS);
         System.out.println("    --nb-retries <n>                          Retry times when error occurs. Defaults to " + unimelb.mf.client.sync.settings.Settings.DEFAULT_MAX_RETRIES);
