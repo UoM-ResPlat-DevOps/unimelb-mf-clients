@@ -1,0 +1,93 @@
+<?xml version="1.0"?>
+<properties>
+	<server>
+		<!-- Mediaflux server host -->
+		<host>mediaflux.vicnode.org.au</host>
+		<!-- Mediaflux server port -->
+		<port>443</port>
+		<!-- Mediaflux server transport. https, http or tcp/ip -->
+		<protocol>https</protocol>
+		<session>
+			<!-- Retry times on Mediaflux connection failure -->
+			<connectRetryTimes>1</connectRetryTimes>
+			<!-- Time interval (in milliseconds) between retries -->
+			<connectRetryInterval>1000</connectRetryInterval>
+			<!-- Retry times on service execution error -->
+			<executeRetryTimes>1</executeRetryTimes>
+			<!-- Time interval (in milliseconds) between retries -->
+			<executeRetryInterval>1000</executeRetryInterval>
+		</session>
+	</server>
+	<credential>
+		<!-- Application name. Can be used as application key for secure identity 
+			token -->
+		<app>unimelb-mf-sync</app>
+		<!-- Mediaflux user's authentication domain -->
+		<domain>uom</domain>
+		<!-- Mediaflux username -->
+		<user>wilson</user>
+		<!-- Mediaflux user's password -->
+		<password>pass</password>
+		<!-- Mediaflux secure identity token -->
+		<token>xxxyyyzzz</token>
+	</credential>
+	<sync>
+		<settings>
+			<!-- Number of query threads -->
+			<numberOfQueriers>2</numberOfQueriers>
+			<!-- Number of worker threads -->
+			<numberOfWorkers>5</numberOfWorkers>
+			<!-- Batch size (Query page size) -->
+			<batchSize>1000</batchSize>
+			<!-- Compare CRC32 checksum -->
+			<csumCheck>true</csumCheck>
+			<!-- Unarchive? aar/all/none (For download only) -->
+			<unarchive>aar</unarchive>
+			<!-- Overwrite if file exists? (For download only) -->
+			<overwrite>false</overwrite>
+			<!-- Maximum number of retries? -->
+			<maxRetries>0</maxRetries>
+			<!-- Running a daemon in background to scan for local file system changes 
+				periodically. -->
+			<daemon enabled="true">
+				<listenerPort>9761</listenerPort>
+				<!-- Time interval (in milliseconds) between scans -->
+				<scanInterval>60000</scanInterval>
+			</daemon>
+			<!-- Log directory location -->
+			<logDirectory>/tmp</logDirectory>
+			<!-- Exclude empty directories for uploading -->
+			<excludeEmptyFolder>true</excludeEmptyFolder>
+			<!-- verbose -->
+			<verbose>true</verbose>
+			<!-- Send notifications when jobs complete (Non-daemon mode only) -->
+			<notification>
+				<!-- The email recipients. Can be multiple. -->
+				<email>user1@your-domain.org</email>
+				<email>user2@your-domain.org</email>
+			</notification>
+		</settings>
+		<!-- Upload jobs -->
+		<job type="upload">
+			<!-- source directory -->
+			<directory>/path/to/src-directory1</directory>
+			<!-- destination asset namespace. Set parent attribute to true if the 
+				namespace should be a parent namespace. -->
+			<project parent="true">51</project>
+			<!-- inclusive filter. The filter below select all sub-directories' name 
+				start with wilson under the source directory, and all their descendants. -->
+			<include>wilson*/**</include>
+			<!-- exclusive filter. The filter below excludes all files with name: 
+				.DS_store -->
+			<exclude>**/.DS_Store</exclude>
+		</job>
+		<job type="upload">
+			<!-- source directory -->
+			<directory>/path/to/src-directory2</directory>
+			<!-- destination asset namespace -->
+			<namespace parent="false">/path/to/dst-namespace2</namespace>
+			<!-- The filter below excludes all .class files. -->
+			<exclude>**/*.class</exclude>
+		</job>
+	</sync>
+</properties>

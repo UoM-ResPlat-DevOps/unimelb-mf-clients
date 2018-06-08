@@ -67,7 +67,7 @@ public class MFCheck extends MFSyncApp {
         System.out.println("    --no-csum-check                           Do not generate and compare CRC32 checksum.");
         System.out.println("    --nb-queriers <n>                         Number of query threads. Defaults to " + unimelb.mf.client.sync.settings.Settings.DEFAULT_NUM_OF_QUERIERS);
         System.out.println("    --nb-workers <n>                          Number of concurrent worker threads to read local file (to generate checksum) if needed. Defaults to " + unimelb.mf.client.sync.settings.Settings.DEFAULT_NUM_OF_WORKERS);
-        System.out.println("    --nb-retries <n>                          Retry times when error occurs. Defaults to " + unimelb.mf.client.sync.settings.Settings.DEFAULT_NUM_OF_RETRIES);
+        System.out.println("    --nb-retries <n>                          Retry times when error occurs. Defaults to " + unimelb.mf.client.sync.settings.Settings.DEFAULT_MAX_RETRIES);
         System.out.println("    --batch-size <size>                       Size of the query result. Defaults to " + unimelb.mf.client.sync.settings.Settings.DEFAULT_BATCH_SIZE);
         System.out.println("    --quiet                                   Do not print progress messages.");
         System.out.println();
@@ -256,7 +256,7 @@ public class MFCheck extends MFSyncApp {
         } else if ("--nb-retries".equalsIgnoreCase(args[i])) {
             try {
                 int nbRetries = Integer.parseInt(args[i + 1]);
-                settings().setRetry(nbRetries);
+                settings().setMaxRetries(nbRetries);
                 return 2;
             } catch (NumberFormatException nfe) {
                 throw new IllegalArgumentException(

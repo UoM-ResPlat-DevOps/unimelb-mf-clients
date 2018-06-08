@@ -67,12 +67,13 @@ public class MFDownload extends MFSyncApp {
         System.out.println("    --csum-check                              If file exists, generate CRC32 checksum and compare with asset checksum before overwriting.");
         System.out.println("    --nb-queriers <n>                         Number of query threads. Defaults to " + unimelb.mf.client.sync.settings.Settings.DEFAULT_NUM_OF_QUERIERS);
         System.out.println("    --nb-workers <n>                          Number of concurrent worker threads to download data. Defaults to " + unimelb.mf.client.sync.settings.Settings.DEFAULT_NUM_OF_WORKERS);
-        System.out.println("    --nb-retries <n>                          Retry times when error occurs. Defaults to " + unimelb.mf.client.sync.settings.Settings.DEFAULT_NUM_OF_RETRIES);
+        System.out.println("    --nb-retries <n>                          Retry times when error occurs. Defaults to " + unimelb.mf.client.sync.settings.Settings.DEFAULT_MAX_RETRIES);
         System.out.println("    --batch-size <size>                       Size of the query result. Defaults to " + unimelb.mf.client.sync.settings.Settings.DEFAULT_BATCH_SIZE);
         System.out.println("    --daemon                                  Run as a daemon.");
         System.out.println("    --daemon-port <port>                      Daemon listener port if running as a daemon. Defaults to " + unimelb.mf.client.sync.settings.Settings.DEFAULT_DAEMON_LISTENER_PORT);
         System.out.println("    --daemon-scan-interval <seconds>          Time interval between scans of source asset namespaces. Defaults to " + (unimelb.mf.client.sync.settings.Settings.DEFAULT_DAEMON_SCAN_INTERVAL/1000));
         System.out.println("    --log-dir <dir>                           Path to the directory for log files. No logging if not specified.");
+        System.out.println("    --notify <email-addresses>                When completes, send email notification to the recipients(comma-separated email addresses if multiple). Not applicable for daemon mode.");
         System.out.println("    --quiet                                   Do not print progress messages.");
         System.out.println();
         System.out.println("POSITIONAL ARGUMENTS:");
@@ -240,7 +241,7 @@ public class MFDownload extends MFSyncApp {
         } else if ("--nb-retries".equalsIgnoreCase(args[i])) {
             try {
                 int nbRetries = Integer.parseInt(args[i + 1]);
-                settings().setRetry(nbRetries);
+                settings().setMaxRetries(nbRetries);
                 return 2;
             } catch (NumberFormatException nfe) {
                 throw new IllegalArgumentException(
@@ -286,6 +287,10 @@ public class MFDownload extends MFSyncApp {
             }
             settings().setLogDirectory(logDir);
             return 2;
+        } else if ("--notify".equalsIgnoreCase(args[i])) {
+            String[] emails = args[i + 1].indexOf(',') != -1 ? args[i + 1].split(",") : new String[] { args[i + 1] };
+            settings().addRecipients(emails);
+            return 2;
         } else if ("--quiet".equalsIgnoreCase(args[i])) {
             settings().setVerbose(false);
             return 1;
@@ -308,7 +313,18 @@ public class MFDownload extends MFSyncApp {
             app.printUsage();
             System.exit(1);
         }
-        app.execute();
+        if (app.settings().daemon()) {
+            Runtime.getRuntime().addShutdownHook(new Thread(new Runnable() {
+
+                @Override
+                public void run() {
+                    app.interrupt();
+                }
+            }));
+            new Thread(app).start();
+        } else {
+            app.execute();
+        }
     }
 
 }

@@ -1,17 +1,24 @@
 package unimelb.mf.client.sync.settings;
 
+import java.io.BufferedReader;
 import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.Reader;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Set;
 
+import arc.xml.XmlDoc;
 import unimelb.mf.client.session.MFSession;
 import unimelb.mf.client.sync.check.CheckHandler;
 import unimelb.mf.client.sync.task.AssetDownloadTask;
+import unimelb.mf.client.sync.task.AssetDownloadTask.Unarchive;
 import unimelb.mf.client.task.MFApp;
 import unimelb.mf.client.util.AssetNamespaceUtils;
 
@@ -22,7 +29,7 @@ public class Settings implements MFApp.Settings {
     public static final int DEFAULT_NUM_OF_QUERIERS = 1;
     public static final int DEFAULT_NUM_OF_WORKERS = 1;
     public static final int DEFAULT_BATCH_SIZE = 1000;
-    public static final int DEFAULT_NUM_OF_RETRIES = 0;
+    public static final int DEFAULT_MAX_RETRIES = 0;
 
     private List<Job> _jobs;
     private Path _logDir = Paths.get(System.getProperty("java.io.tmpdir"));
@@ -38,7 +45,7 @@ public class Settings implements MFApp.Settings {
 
     private boolean _csumCheck;
 
-    private int _retry = DEFAULT_NUM_OF_RETRIES; // Number of retries...
+    private int _maxRetries = DEFAULT_MAX_RETRIES; // Number of retries...
 
     /*
      * download settings
@@ -47,11 +54,18 @@ public class Settings implements MFApp.Settings {
     private AssetDownloadTask.Unarchive _unarchive = AssetDownloadTask.Unarchive.NONE;
 
     /*
+     * upload settings;
+     */
+    private boolean _excludeEmptyFolder = true;
+
+    /*
      * check settings
      */
     private CheckHandler _checkHandler = null;
 
     private boolean _verbose = false;
+
+    private Set<String> _recipients;
 
     public Settings() {
         _jobs = new ArrayList<Job>();
@@ -237,14 +251,22 @@ public class Settings implements MFApp.Settings {
     }
 
     public int retry() {
-        return _retry;
+        return _maxRetries;
     }
 
-    public void setRetry(int retry) {
+    public void setMaxRetries(int retry) {
         if (retry < 0) {
-            _retry = 0;
+            _maxRetries = 0;
         }
-        _retry = retry;
+        _maxRetries = retry;
+    }
+
+    public boolean excludeEmptyFolder() {
+        return _excludeEmptyFolder;
+    }
+
+    public void setExcludeEmptyFolder(boolean excludeEmptyFolder) {
+        _excludeEmptyFolder = excludeEmptyFolder;
     }
 
     public boolean verbose() {
@@ -263,6 +285,25 @@ public class Settings implements MFApp.Settings {
         _daemonScanInterval = interval;
     }
 
+    public boolean hasRecipients() {
+        return _recipients != null && !_recipients.isEmpty();
+    }
+
+    public Collection<String> recipients() {
+        return _recipients == null ? null : Collections.unmodifiableCollection(_recipients);
+    }
+
+    public void addRecipients(String... emails) {
+        if (emails != null && emails.length > 0) {
+            if (_recipients == null) {
+                _recipients = new LinkedHashSet<String>();
+            }
+            for (String email : emails) {
+                _recipients.add(email.toLowerCase());
+            }
+        }
+    }
+
     public boolean hasJobs() {
         return _jobs != null && !_jobs.isEmpty();
     }
@@ -276,6 +317,108 @@ public class Settings implements MFApp.Settings {
             }
         }
         return true;
+    }
+
+    public void loadFromXmlFile(Path xmlFile) throws Throwable {
+        if (xmlFile != null) {
+            Reader r = new BufferedReader(new FileReader(xmlFile.toFile()));
+            try {
+                XmlDoc.Element se = new XmlDoc().parse(r).element("properties/sync/settings");
+                if (se == null) {
+                    throw new Exception("element properties/sync/settings is not found.");
+                }
+
+                if (se.elementExists("numberOfQueriers")) {
+                    setNumberOfQueriers(se.intValue("numberOfQueriers"));
+                }
+                if (se.elementExists("numberOfWorkers")) {
+                    setNumberOfQueriers(se.intValue("numberOfWorkers"));
+                }
+                if (se.elementExists("batchSize")) {
+                    setBatchSize(se.intValue("batchSize"));
+                }
+                if (se.elementExists("maxRetries")) {
+                    setMaxRetries(se.intValue("maxRetries"));
+                }
+                if (se.elementExists("csumCheck")) {
+                    setCsumCheck(se.booleanValue("csumCheck", false));
+                }
+                if (se.elementExists("overwrite")) {
+                    setOverwrite(se.booleanValue("overwrite", false));
+                }
+                if (se.elementExists("unarchive")) {
+                    setUnarchive(Unarchive.fromString(se.value("unarchive")));
+                }
+                if (se.elementExists("daemon")) {
+                    setDaemon(se.booleanValue("daemon/@enabled", false));
+                    if (se.elementExists("daemon/listenerPort")) {
+                        setDaemonListenerPort(se.intValue("daemon/listenerPort"));
+                    }
+                    if (se.elementExists("daemon/scanInterval")) {
+                        setDaemonScanInterval(se.intValue("daemon/scanInterval"));
+                    }
+                }
+                if (se.elementExists("logDirectory")) {
+                    Path logDir = Paths.get(se.value("logDirectory"));
+                    if (!Files.exists(logDir)) {
+                        throw new FileNotFoundException(logDir.toString());
+                    }
+                    if (!Files.isDirectory(logDir)) {
+                        throw new Exception(logDir.toString() + " is not a directory!");
+                    }
+                    setLogDirectory(logDir);
+                }
+                if (se.elementExists("excludeEmptyFolder")) {
+                    setExcludeEmptyFolder(se.booleanValue("excludeEmptyFolder"));
+                }
+                if (se.elementExists("verbose")) {
+                    setVerbose(se.booleanValue("verbose"));
+                }
+                if (se.elementExists("notification/email")) {
+                    Collection<String> emails = se.values("notification/email");
+                    if (emails != null) {
+                        for (String email : emails) {
+                            addRecipients(email);
+                        }
+                    }
+                }
+            } finally {
+                r.close();
+            }
+        }
+    }
+
+    public boolean hasSyncJobs() {
+        if (_jobs != null && !_jobs.isEmpty()) {
+            for (Job job : _jobs) {
+                if (job.action() == Action.SYNC) {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
+    public boolean hasDownloadJobs() {
+        if (_jobs != null && !_jobs.isEmpty()) {
+            for (Job job : _jobs) {
+                if (job.action() == Action.DOWNLOAD) {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
+    public boolean hasUploadJobs() {
+        if (_jobs != null && !_jobs.isEmpty()) {
+            for (Job job : _jobs) {
+                if (job.action() == Action.UPLOAD) {
+                    return true;
+                }
+            }
+        }
+        return false;
     }
 
 }

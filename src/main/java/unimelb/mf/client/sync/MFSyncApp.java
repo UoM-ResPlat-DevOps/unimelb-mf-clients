@@ -1,6 +1,7 @@
 package unimelb.mf.client.sync;
 
 import java.io.BufferedReader;
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintStream;
@@ -14,6 +15,7 @@ import java.nio.file.Path;
 import java.nio.file.SimpleFileVisitor;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
@@ -30,6 +32,7 @@ import arc.xml.XmlStringWriter;
 import unimelb.mf.client.file.PosixAttributes;
 import unimelb.mf.client.sync.check.AssetItem;
 import unimelb.mf.client.sync.check.ChecksumType;
+import unimelb.mf.client.sync.settings.Action;
 import unimelb.mf.client.sync.settings.Job;
 import unimelb.mf.client.sync.task.AssetDownloadTask;
 import unimelb.mf.client.sync.task.AssetSetCheckTask;
@@ -37,8 +40,9 @@ import unimelb.mf.client.sync.task.DataTransferListener;
 import unimelb.mf.client.sync.task.FileSetCheckTask;
 import unimelb.mf.client.sync.task.FileSetUploadTask;
 import unimelb.mf.client.task.AbstractMFApp;
+import unimelb.mf.client.util.MailUtils;
 
-public abstract class MFSyncApp extends AbstractMFApp<unimelb.mf.client.sync.settings.Settings> {
+public abstract class MFSyncApp extends AbstractMFApp<unimelb.mf.client.sync.settings.Settings> implements Runnable {
 
     private unimelb.mf.client.sync.settings.Settings _settings;
     private ThreadPoolExecutor _workers;
@@ -131,6 +135,20 @@ public abstract class MFSyncApp extends AbstractMFApp<unimelb.mf.client.sync.set
 
     protected void preExecute() throws Throwable {
 
+    }
+
+    @Override
+    public void run() {
+        try {
+            execute();
+        } catch (Throwable e) {
+            if (e instanceof InterruptedException) {
+                logger().log(Level.WARNING, e.getMessage());
+                Thread.currentThread().interrupt();
+            } else {
+                logger().log(Level.SEVERE, e.getMessage(), e);
+            }
+        }
     }
 
     @Override
@@ -247,7 +265,7 @@ public abstract class MFSyncApp extends AbstractMFApp<unimelb.mf.client.sync.set
                                 }
                             }
                         } catch (SocketException se) {
-                            logger().info("Listening socket closed!");
+                            // logger().info("Listening socket closed!");
                         } finally {
                             _daemonListenerSocket.close();
                         }
@@ -255,13 +273,47 @@ public abstract class MFSyncApp extends AbstractMFApp<unimelb.mf.client.sync.set
                         logger().log(Level.SEVERE, e.getMessage(), e);
                     }
                 }
+
             }, applicationName().toLowerCase() + ".daemon.listener");
             _daemonListener.start();
         }
     }
 
     protected void printSummary(PrintStream ps) {
+        List<Job> jobs = settings().jobs();
+        if (jobs != null && !jobs.isEmpty()) {
+            ps.println();
+            if (settings().hasSyncJobs()) {
+                ps.println("Sync:");
+                for (Job job : jobs) {
+                    if (job.action() == Action.SYNC) {
+                        ps.println("    src(directory):" + job.directory().toString());
+                        ps.println("    dst(mediaflux):" + job.namespace());
+                    }
+                }
+            }
+            if (settings().hasDownloadJobs()) {
+                ps.println("Download:");
+                for (Job job : jobs) {
+                    if (job.action() == Action.DOWNLOAD) {
+                        ps.println("    src(mediaflux):" + job.namespace());
+                        ps.println("    dst(directory):" + job.directory().toString());
+                    }
+                }
+            }
+            if (settings().hasUploadJobs()) {
+                ps.println("Upload:");
+                for (Job job : jobs) {
+                    if (job.action() == Action.UPLOAD) {
+                        ps.println("    src(directory):" + job.directory().toString());
+                        ps.println("    dst(mediaflux):" + job.namespace());
+                    }
+                }
+            }
+            ps.println();
+        }
         ps.println();
+        ps.println("Summary:");
         int totalFiles = _nbUploadedFiles.get() + _nbSkippedFiles.get() + _nbFailedFiles.get();
         if (totalFiles > 0) {
             ps.println(String.format("    Uploaded files: %,32d files", _nbUploadedFiles.get()));
@@ -467,7 +519,8 @@ public abstract class MFSyncApp extends AbstractMFApp<unimelb.mf.client.sync.set
                             continue;
                         }
                     }
-                    _workers.submit(new AssetDownloadTask(session(), logger(), assetPath, file, _dl));
+                    _workers.submit(
+                            new AssetDownloadTask(session(), logger(), assetPath, file, settings().unarchive(), _dl));
                 }
             }
             completed = re.longValue("cursor/remaining") == 0;
@@ -573,12 +626,34 @@ public abstract class MFSyncApp extends AbstractMFApp<unimelb.mf.client.sync.set
     protected void postExecute() {
         if (!settings().hasOnlyCheckJobs()) {
             printSummary(System.out);
+            notifySummary();
         }
     }
 
     @Override
     public unimelb.mf.client.sync.settings.Settings settings() {
         return _settings;
+    }
+
+    public void notifySummary() {
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        PrintStream ps = new PrintStream(baos);
+        try {
+            printSummary(ps);
+            String summary = baos.toString();
+            String subject = applicationName() + " results [" + new Date() + "]";
+            notify(subject, summary);
+        } catch (Throwable e) {
+            logger().log(Level.SEVERE, e.getMessage(), e);
+        } finally {
+            ps.close();
+        }
+    }
+
+    public void notify(String subject, String message) throws Throwable {
+        if (settings().hasRecipients()) {
+            MailUtils.sendMail(session(), settings().recipients(), subject, message, true);
+        }
     }
 
 }

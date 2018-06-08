@@ -53,19 +53,21 @@ public class AssetDownloadTask extends AbstractMFTask {
 
     private DataTransferListener<String, Path> _dl;
 
-    public AssetDownloadTask(MFSession session, Logger logger, String assetPath, Path dstPath,
+    public AssetDownloadTask(MFSession session, Logger logger, String assetPath, Path dstPath, Unarchive unarchive,
             DataTransferListener<String, Path> dl) {
         super(session, logger);
         _assetPath = assetPath;
         _dstPath = dstPath.toAbsolutePath();
+        _unarchive = unarchive == null ? Unarchive.NONE : unarchive;
         _dl = dl;
     }
 
-    protected AssetDownloadTask(MFSession session, Logger logger, Path dstPath, String assetId,
+    protected AssetDownloadTask(MFSession session, Logger logger, Path dstPath, String assetId, Unarchive unarchive,
             DataTransferListener<String, Path> dl) {
         super(session, logger);
         _dstPath = dstPath.toAbsolutePath();
         _assetId = assetId;
+        _unarchive = unarchive == null ? Unarchive.NONE : unarchive;
         _dl = dl;
     }
 
