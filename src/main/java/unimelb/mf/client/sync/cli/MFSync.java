@@ -73,6 +73,7 @@ public class MFSync extends MFSyncApp {
         System.out.println("    --log-dir <dir>                           Path to the directory for log files. No logging if not specified.");
         System.out.println("    --notify <email-addresses>                When completes, send email notification to the recipients(comma-separated email addresses if multiple). Not applicable for daemon mode.");
         System.out.println("    --quiet                                   Do not print progress messages.");
+        System.out.println("    --help                                    Prints usage.");
         System.out.println();
         System.out.println("POSITIONAL ARGUMENTS:");
         System.out.println("    <dir>                                     Local directory path.");
@@ -90,6 +91,10 @@ public class MFSync extends MFSyncApp {
         if (args != null) {
             try {
                 for (int i = 0; i < args.length;) {
+                    if ("--help".equalsIgnoreCase(args[i]) || "-h".equalsIgnoreCase(args[i])) {
+                        printUsage();
+                        System.exit(0);
+                    }
                     int n = parseMFOptions(args, i);
                     if (n > 0) {
                         i += n;

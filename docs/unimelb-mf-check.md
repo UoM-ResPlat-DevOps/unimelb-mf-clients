@@ -3,7 +3,7 @@ USAGE:
     unimelb-mf-check [OPTIONS] --direction <up|down|both> --output <output.csv> <dir1> <namespace1> [<dir2> <namespace2>...]
 
 DESCRIPTION:
-    Compare files in local diretory with assets in remote asset namespace.
+    Compare files in local directory with assets in remote Mediaflux asset namespace and generates a list of the differences.
 
 OPTIONS:
     --mf.config <mflux.cfg>                   Path to the config file that contains Mediaflux server details and user credentials.
@@ -15,7 +15,7 @@ OPTIONS:
     --direction <up|down|both>                Direction(up/down/both).
     -o, --output <output.csv>                 Output CSV file.
     --detailed-output                         Include all files checked. Otherwise, only the missing or invalid files are included in the output.
-    --no-csum-check                           Do not generate and compare CRC32 checksum.
+    --no-csum-check                           Files are equated if the name, size and CRC32 checksum are the same. With this argument, you can exclude the CRC32 checksum comparison.
     --nb-queriers <n>                         Number of query threads. Defaults to 1
     --nb-workers <n>                          Number of concurrent worker threads to read local file (to generate checksum) if needed. Defaults to 1
     --nb-retries <n>                          Retry times when error occurs. Defaults to 0

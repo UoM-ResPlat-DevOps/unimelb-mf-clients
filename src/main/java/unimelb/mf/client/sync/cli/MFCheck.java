@@ -70,6 +70,7 @@ public class MFCheck extends MFSyncApp {
         System.out.println("    --nb-retries <n>                          Retry times when error occurs. Defaults to " + unimelb.mf.client.sync.settings.Settings.DEFAULT_MAX_RETRIES);
         System.out.println("    --batch-size <size>                       Size of the query result. Defaults to " + unimelb.mf.client.sync.settings.Settings.DEFAULT_BATCH_SIZE);
         System.out.println("    --quiet                                   Do not print progress messages.");
+        System.out.println("    --help                                    Prints usage.");
         System.out.println();
         System.out.println("POSITIONAL ARGUMENTS:");
         System.out.println("    <dir>                                     Local directory path.");
@@ -88,6 +89,10 @@ public class MFCheck extends MFSyncApp {
         if (args != null) {
             try {
                 for (int i = 0; i < args.length;) {
+                    if ("--help".equalsIgnoreCase(args[i]) || "-h".equalsIgnoreCase(args[i])) {
+                        printUsage();
+                        System.exit(0);
+                    }
                     int n = parseMFOptions(args, i);
                     if (n > 0) {
                         i += n;

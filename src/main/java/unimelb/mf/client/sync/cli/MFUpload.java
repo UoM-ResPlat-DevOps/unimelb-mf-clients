@@ -88,6 +88,10 @@ public class MFUpload extends MFSyncApp {
         if (args != null) {
             try {
                 for (int i = 0; i < args.length;) {
+                    if ("--help".equalsIgnoreCase(args[i]) || "-h".equalsIgnoreCase(args[i])) {
+                        printUsage();
+                        System.exit(0);
+                    }
                     int n = parseMFOptions(args, i);
                     if (n > 0) {
                         i += n;
