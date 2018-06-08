@@ -67,7 +67,7 @@ public class MFUpload extends MFSyncApp {
         System.out.println("    --batch-size <size>                       Size of the query result. Defaults to " + unimelb.mf.client.sync.settings.Settings.DEFAULT_BATCH_SIZE);
         System.out.println("    --daemon                                  Run as a daemon.");
         System.out.println("    --daemon-port <port>                      Daemon listener port if running as a daemon. Defaults to " + unimelb.mf.client.sync.settings.Settings.DEFAULT_DAEMON_LISTENER_PORT);
-        System.out.println("    --daemon-scan-interval <seconds>          Time interval between scans of source directories. Defaults to " + (unimelb.mf.client.sync.settings.Settings.DEFAULT_DAEMON_SCAN_INTERVAL/1000));
+        System.out.println("    --daemon-scan-interval <seconds>          Time interval (in seconds) between scans of source directories. Defaults to " + (unimelb.mf.client.sync.settings.Settings.DEFAULT_DAEMON_SCAN_INTERVAL/1000) + " seconds.");
         System.out.println("    --log-dir <dir>                           Path to the directory for log files. No logging if not specified.");
         System.out.println("    --notify <email-addresses>                When completes, send email notification to the recipients(comma-separated email addresses if multiple). Not applicable for daemon mode.");
         System.out.println("    --quiet                                   Do not print progress messages.");
