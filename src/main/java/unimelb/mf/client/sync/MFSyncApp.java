@@ -478,7 +478,7 @@ public abstract class MFSyncApp extends AbstractMFApp<unimelb.mf.client.sync.set
             XmlStringWriter w = new XmlStringWriter();
             String where = "namespace>='" + job.namespace() + "' and asset has content";
             if (_stimeLast != null) {
-                where += " and stime>=" + _stimeLast;
+                where += " and stime>" + _stimeLast;
             }
             w.add("where", where);
             w.add("action", "get-value");
