@@ -10,7 +10,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutorService;
-import java.util.concurrent.atomic.AtomicLong;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -30,10 +30,10 @@ public class SyncDeleteFilesTask extends AbstractMFTask {
     private int _batchSize = DEFAULT_BATCH_SIZE;
     private boolean _verbose = true;
     private ExecutorService _workers;
-    private AtomicLong _counter;
+    private AtomicInteger _counter;
 
     protected SyncDeleteFilesTask(MFSession session, Logger logger, String ns, Path dir, int batchSize,
-            ExecutorService workers, boolean verbose, AtomicLong counter) {
+            ExecutorService workers, boolean verbose, AtomicInteger counter) {
         super(session, logger);
         _ns = ns;
         _dir = dir;
@@ -44,7 +44,7 @@ public class SyncDeleteFilesTask extends AbstractMFTask {
     }
 
     public SyncDeleteFilesTask(MFSession session, Logger logger, Job job, Settings settings, ExecutorService workers,
-            AtomicLong counter) {
+            AtomicInteger counter) {
         this(session, logger, job.namespace(), job.directory(), settings.batchSize(), workers, settings.verbose(),
                 counter);
     }
@@ -52,7 +52,7 @@ public class SyncDeleteFilesTask extends AbstractMFTask {
     @Override
     public void execute() throws Throwable {
         if (_verbose) {
-            logger().info("checking files in directory: '" + _dir.toString() + "'");
+            logger().info("Checking files in directory: '" + _dir.toString() + "' Looking for files to delete...");
         }
         List<Path> files = new ArrayList<Path>(_batchSize);
         Files.walkFileTree(_dir, new SimpleFileVisitor<Path>() {
@@ -104,11 +104,12 @@ public class SyncDeleteFilesTask extends AbstractMFTask {
         });
         if (!files.isEmpty()) {
             // check files
+            final List<Path> toCheck = new ArrayList<Path>(files);
             _workers.submit(new Callable<Void>() {
 
                 @Override
                 public Void call() throws Exception {
-                    checkAndDeleteFiles(files);
+                    checkAndDeleteFiles(toCheck);
                     return null;
                 }
             });
@@ -129,7 +130,7 @@ public class SyncDeleteFilesTask extends AbstractMFTask {
                     Path file = files.get(i);
                     boolean exists = ees.get(i).booleanValue();
                     if (!exists) {
-                        logger().info("deleting file: '" + file.toString() + "'");
+                        logger().info("Deleting file: '" + file.toString() + "'");
                         if (Files.exists(file)) {
                             Files.delete(file);
                         }

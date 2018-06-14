@@ -74,6 +74,7 @@ public class MFDownload extends MFSyncApp {
         System.out.println("    --daemon-scan-interval <seconds>          Time interval (in seconds) between scans of source asset namespaces. Defaults to " + (unimelb.mf.client.sync.settings.Settings.DEFAULT_DAEMON_SCAN_INTERVAL/1000) + " seconds.");
         System.out.println("    --log-dir <dir>                           Path to the directory for log files. No logging if not specified.");
         System.out.println("    --notify <email-addresses>                When completes, send email notification to the recipients(comma-separated email addresses if multiple). Not applicable for daemon mode.");
+        System.out.println("    --sync-delete-files                       Delete local files that do not have corresponding assets exist on the server side.");
         System.out.println("    --quiet                                   Do not print progress messages.");
         System.out.println("    --help                                    Prints usage.");
         System.out.println();
@@ -296,6 +297,9 @@ public class MFDownload extends MFSyncApp {
             String[] emails = args[i + 1].indexOf(',') != -1 ? args[i + 1].split(",") : new String[] { args[i + 1] };
             settings().addRecipients(emails);
             return 2;
+        } else if ("--sync-delete-files".equalsIgnoreCase(args[i])) {
+            settings().setDeleteFiles(true);
+            return 1;
         } else if ("--quiet".equalsIgnoreCase(args[i])) {
             settings().setVerbose(false);
             return 1;

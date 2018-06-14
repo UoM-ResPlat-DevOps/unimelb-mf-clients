@@ -57,13 +57,13 @@ public abstract class MFSyncApp extends AbstractMFApp<unimelb.mf.client.sync.set
     private AtomicInteger _nbSkippedFiles = new AtomicInteger(0);
     private AtomicInteger _nbFailedFiles = new AtomicInteger(0);
     private AtomicLong _nbUploadedBytes = new AtomicLong(0);
-    private AtomicLong _nbDeletedFiles = new AtomicLong(0);
+    private AtomicInteger _nbDeletedFiles = new AtomicInteger(0);
 
     private AtomicInteger _nbDownloadedAssets = new AtomicInteger(0);
     private AtomicInteger _nbSkippedAssets = new AtomicInteger(0);
     private AtomicInteger _nbFailedAssets = new AtomicInteger(0);
     private AtomicLong _nbDownloadedBytes = new AtomicLong(0);
-    private AtomicLong _nbDeletedAssets = new AtomicLong(0);
+    private AtomicInteger _nbDeletedAssets = new AtomicInteger(0);
 
     private DataTransferListener<Path, String> _ul;
     private DataTransferListener<String, Path> _dl;
@@ -198,8 +198,8 @@ public abstract class MFSyncApp extends AbstractMFApp<unimelb.mf.client.sync.set
             if (!settings().daemon() && (settings().needToDeleteAssets() || settings().needToDeleteFiles())) {
                 // waiting until the threadpools are clear. This is
                 // required for sync jobs.
-                while (_queriers.getActiveCount() == 0 && _queriers.getQueue().isEmpty()
-                        && _workers.getActiveCount() == 0 && _workers.getQueue().isEmpty()) {
+                while (_queriers.getActiveCount() > 0 || !_queriers.getQueue().isEmpty()
+                        || _workers.getActiveCount() > 0 || !_workers.getQueue().isEmpty()) {
                     Thread.sleep(1000);
                 }
                 if (settings().deleteAssets()) {
@@ -264,9 +264,7 @@ public abstract class MFSyncApp extends AbstractMFApp<unimelb.mf.client.sync.set
                 }, settings().daemonScanInterval(), settings().daemonScanInterval());
             }
         }
-        if (_daemonListener == null)
-
-        {
+        if (_daemonListener == null) {
             // Both recurring execution and one-off execution can benefit from
             // the listener.
             _daemonListener = new Thread(new Runnable() {
@@ -356,16 +354,24 @@ public abstract class MFSyncApp extends AbstractMFApp<unimelb.mf.client.sync.set
             ps.println(String.format("     Skipped files: %,32d files", _nbSkippedFiles.get()));
             ps.println(String.format("      Failed files: %,32d files", _nbFailedFiles.get()));
             ps.println(String.format("    Uploaded bytes: %,32d bytes", _nbUploadedBytes.get()));
-            ps.println(String.format("     Deleted files: %,32d files", _nbDeletedFiles.get()));
+            ps.println();
+        }
+        int deletedAssets = _nbDeletedAssets.get();
+        if (deletedAssets > 0) {
+            ps.println(String.format("    Deleted Assets: %,32d assets", _nbDeletedAssets.get()));
             ps.println();
         }
         int totalAssets = _nbDownloadedAssets.get() + _nbSkippedAssets.get() + _nbFailedAssets.get();
         if (totalAssets > 0) {
-            ps.println(String.format("  Downloaded assets: %,32d files", _nbDownloadedAssets.get()));
-            ps.println(String.format("     Skipped assets: %,32d files", _nbSkippedAssets.get()));
-            ps.println(String.format("      Failed assets: %,32d files", _nbFailedAssets.get()));
-            ps.println(String.format("  Downloaded  bytes: %,32d bytes", _nbDownloadedBytes.get()));
-            ps.println(String.format("     Deleted assets: %,32d assets", _nbDeletedAssets.get()));
+            ps.println(String.format(" Downloaded assets: %,32d files", _nbDownloadedAssets.get()));
+            ps.println(String.format("    Skipped assets: %,32d files", _nbSkippedAssets.get()));
+            ps.println(String.format("     Failed assets: %,32d files", _nbFailedAssets.get()));
+            ps.println(String.format(" Downloaded  bytes: %,32d bytes", _nbDownloadedBytes.get()));
+            ps.println();
+        }
+        int deletedFiles = _nbDeletedFiles.get();
+        if (deletedFiles > 0) {
+            ps.println(String.format("     Deleted files: %,32d files", _nbDeletedFiles.get()));
             ps.println();
         }
     }
@@ -377,7 +383,9 @@ public abstract class MFSyncApp extends AbstractMFApp<unimelb.mf.client.sync.set
         }
         if (_daemonListener != null) {
             try {
-                _daemonListenerSocket.close();
+                if (_daemonListenerSocket != null) {
+                    _daemonListenerSocket.close();
+                }
             } catch (IOException e) {
                 logger().log(Level.SEVERE, e.getMessage(), e);
             } finally {

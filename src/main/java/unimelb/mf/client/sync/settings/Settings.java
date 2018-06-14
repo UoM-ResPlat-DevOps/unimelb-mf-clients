@@ -71,7 +71,7 @@ public class Settings implements MFApp.Settings {
 
     private boolean _deleteAssets = false;
 
-    private boolean _hardDestroy = false;
+    private boolean _hardDestroyAssets = false;
 
     public Settings() {
         _jobs = new ArrayList<Job>();
@@ -453,12 +453,12 @@ public class Settings implements MFApp.Settings {
         _deleteAssets = deleteAssets;
     }
 
-    public boolean hardDestroy() {
-        return _hardDestroy;
+    public boolean hardDestroyAssets() {
+        return _hardDestroyAssets;
     }
 
-    public void setHardDestroy(boolean hardDestroy) {
-        _hardDestroy = hardDestroy;
+    public void setHardDestroyAssets(boolean hardDestroy) {
+        _hardDestroyAssets = hardDestroy;
     }
 
     public boolean needToDeleteFiles() {

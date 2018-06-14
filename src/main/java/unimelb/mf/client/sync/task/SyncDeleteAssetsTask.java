@@ -6,7 +6,7 @@ import java.util.Collection;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
-import java.util.concurrent.atomic.AtomicLong;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.logging.Logger;
 
 import arc.xml.XmlDoc;
@@ -25,10 +25,10 @@ public class SyncDeleteAssetsTask extends AbstractMFTask {
     private boolean _hardDestroy = false;
     private int _batchSize = DEFAULT_BATCH_SIZE;
     private boolean _verbose = true;
-    private AtomicLong _counter;
+    private AtomicInteger _counter;
 
     public SyncDeleteAssetsTask(MFSession session, Logger logger, Path dir, String ns, boolean hardDestroy,
-            int batchSize, boolean verbose, AtomicLong counter) {
+            int batchSize, boolean verbose, AtomicInteger counter) {
         super(session, logger);
         _dir = dir;
         _ns = ns;
@@ -38,13 +38,16 @@ public class SyncDeleteAssetsTask extends AbstractMFTask {
         _counter = counter;
     }
 
-    public SyncDeleteAssetsTask(MFSession session, Logger logger, Job job, Settings settings, AtomicLong counter) {
-        this(session, logger, job.directory(), job.namespace(), settings.hardDestroy(), settings.batchSize(),
+    public SyncDeleteAssetsTask(MFSession session, Logger logger, Job job, Settings settings, AtomicInteger counter) {
+        this(session, logger, job.directory(), job.namespace(), settings.hardDestroyAssets(), settings.batchSize(),
                 settings.verbose(), counter);
     }
 
     @Override
     public void execute() throws Throwable {
+        if (_verbose) {
+            logger().info("Checking namespace: '" + _ns + "' Looking for assets to delete...");
+        }
         int idx = 1;
         boolean completed = false;
         do {
@@ -65,7 +68,7 @@ public class SyncDeleteAssetsTask extends AbstractMFTask {
                     if (!Files.exists(file)) {
                         toDestroy.add(assetId);
                         if (_verbose) {
-                            logger().info("submitted asset: '" + assetPath + "' to destroy");
+                            logger().info("Submitted asset: '" + assetPath + "' to destroy");
                         }
                     }
                 }
@@ -75,7 +78,7 @@ public class SyncDeleteAssetsTask extends AbstractMFTask {
                         _counter.getAndAdd(toDestroy.size());
                     }
                     if (_verbose) {
-                        logger().info("deleted " + toDestroy.size() + " assets...");
+                        logger().info("Deleted " + toDestroy.size() + " assets...");
                     }
                     idx -= toDestroy.size();
                 }
