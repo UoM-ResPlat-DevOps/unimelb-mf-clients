@@ -25,6 +25,7 @@ OPTIONS:
     --daemon-scan-interval <seconds>          Time interval (in seconds) between scans of source asset namespaces. Defaults to 60 seconds.
     --log-dir <dir>                           Path to the directory for log files. No logging if not specified.
     --notify <email-addresses>                When completes, send email notification to the recipients(comma-separated email addresses if multiple). Not applicable for daemon mode.
+    --sync-delete-files                       Delete local files that do not have corresponding assets exist on the server side.
     --quiet                                   Do not print progress messages.
     --help                                    Prints usage.
 
