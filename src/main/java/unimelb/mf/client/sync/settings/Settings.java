@@ -67,6 +67,12 @@ public class Settings implements MFApp.Settings {
 
     private Set<String> _recipients;
 
+    private boolean _deleteFiles = false;
+
+    private boolean _deleteAssets = false;
+
+    private boolean _hardDestroy = false;
+
     public Settings() {
         _jobs = new ArrayList<Job>();
     }
@@ -419,6 +425,48 @@ public class Settings implements MFApp.Settings {
             }
         }
         return false;
+    }
+
+    /**
+     * Delete local files.
+     * 
+     * @return
+     */
+    public boolean deleteFiles() {
+        return _deleteFiles;
+    }
+
+    public void setDeleteFiles(boolean deleteFiles) {
+        _deleteFiles = deleteFiles;
+    }
+
+    /**
+     * Destroy remote assets.
+     * 
+     * @return
+     */
+    public boolean deleteAssets() {
+        return _deleteAssets;
+    }
+
+    public void setDeleteAssets(boolean deleteAssets) {
+        _deleteAssets = deleteAssets;
+    }
+
+    public boolean hardDestroy() {
+        return _hardDestroy;
+    }
+
+    public void setHardDestroy(boolean hardDestroy) {
+        _hardDestroy = hardDestroy;
+    }
+
+    public boolean needToDeleteFiles() {
+        return (hasDownloadJobs() || hasSyncJobs()) && deleteFiles();
+    }
+
+    public boolean needToDeleteAssets() {
+        return (hasUploadJobs() || hasSyncJobs()) && deleteAssets();
     }
 
 }

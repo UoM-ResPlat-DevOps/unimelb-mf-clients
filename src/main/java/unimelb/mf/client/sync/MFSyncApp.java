@@ -39,6 +39,8 @@ import unimelb.mf.client.sync.task.AssetSetCheckTask;
 import unimelb.mf.client.sync.task.DataTransferListener;
 import unimelb.mf.client.sync.task.FileSetCheckTask;
 import unimelb.mf.client.sync.task.FileSetUploadTask;
+import unimelb.mf.client.sync.task.SyncDeleteAssetsTask;
+import unimelb.mf.client.sync.task.SyncDeleteFilesTask;
 import unimelb.mf.client.task.AbstractMFApp;
 import unimelb.mf.client.util.MailUtils;
 
@@ -55,11 +57,13 @@ public abstract class MFSyncApp extends AbstractMFApp<unimelb.mf.client.sync.set
     private AtomicInteger _nbSkippedFiles = new AtomicInteger(0);
     private AtomicInteger _nbFailedFiles = new AtomicInteger(0);
     private AtomicLong _nbUploadedBytes = new AtomicLong(0);
+    private AtomicLong _nbDeletedFiles = new AtomicLong(0);
 
     private AtomicInteger _nbDownloadedAssets = new AtomicInteger(0);
     private AtomicInteger _nbSkippedAssets = new AtomicInteger(0);
     private AtomicInteger _nbFailedAssets = new AtomicInteger(0);
     private AtomicLong _nbDownloadedBytes = new AtomicLong(0);
+    private AtomicLong _nbDeletedAssets = new AtomicLong(0);
 
     private DataTransferListener<Path, String> _ul;
     private DataTransferListener<String, Path> _dl;
@@ -190,6 +194,21 @@ public abstract class MFSyncApp extends AbstractMFApp<unimelb.mf.client.sync.set
             startDaemon();
 
             submitJobs();
+
+            if (!settings().daemon() && (settings().needToDeleteAssets() || settings().needToDeleteFiles())) {
+                // waiting until the threadpools are clear. This is
+                // required for sync jobs.
+                while (_queriers.getActiveCount() == 0 && _queriers.getQueue().isEmpty()
+                        && _workers.getActiveCount() == 0 && _workers.getQueue().isEmpty()) {
+                    Thread.sleep(1000);
+                }
+                if (settings().deleteAssets()) {
+                    syncDeleteAssets();
+                }
+                if (settings().deleteFiles()) {
+                    syncDeleteFiles();
+                }
+            }
         } catch (Throwable e) {
             logger().log(Level.SEVERE, e.getMessage(), e);
         } finally {
@@ -221,6 +240,21 @@ public abstract class MFSyncApp extends AbstractMFApp<unimelb.mf.client.sync.set
                         if (_queriers.getActiveCount() == 0 && _queriers.getQueue().isEmpty()
                                 && _workers.getActiveCount() == 0 && _workers.getQueue().isEmpty()) {
                             try {
+                                if (settings().deleteAssets()) {
+                                    syncDeleteAssets();
+                                }
+                                if (settings().deleteFiles()) {
+                                    syncDeleteFiles();
+                                }
+                                // waiting until the thread pools are clear.
+                                // This is required for sync jobs, and the
+                                // situation, where there are both download and
+                                // upload jobs
+                                while (_queriers.getActiveCount() > 0 || !_queriers.getQueue().isEmpty()
+                                        || _workers.getActiveCount() > 0 || !_workers.getQueue().isEmpty()) {
+                                    // wait until threadpools are clear.
+                                    Thread.sleep(1000);
+                                }
                                 submitJobs();
                             } catch (Throwable e) {
                                 logger().log(Level.SEVERE, e.getMessage(), e);
@@ -322,6 +356,7 @@ public abstract class MFSyncApp extends AbstractMFApp<unimelb.mf.client.sync.set
             ps.println(String.format("     Skipped files: %,32d files", _nbSkippedFiles.get()));
             ps.println(String.format("      Failed files: %,32d files", _nbFailedFiles.get()));
             ps.println(String.format("    Uploaded bytes: %,32d bytes", _nbUploadedBytes.get()));
+            ps.println(String.format("     Deleted files: %,32d files", _nbDeletedFiles.get()));
             ps.println();
         }
         int totalAssets = _nbDownloadedAssets.get() + _nbSkippedAssets.get() + _nbFailedAssets.get();
@@ -330,6 +365,7 @@ public abstract class MFSyncApp extends AbstractMFApp<unimelb.mf.client.sync.set
             ps.println(String.format("     Skipped assets: %,32d files", _nbSkippedAssets.get()));
             ps.println(String.format("      Failed assets: %,32d files", _nbFailedAssets.get()));
             ps.println(String.format("  Downloaded  bytes: %,32d bytes", _nbDownloadedBytes.get()));
+            ps.println(String.format("     Deleted assets: %,32d assets", _nbDeletedAssets.get()));
             ps.println();
         }
     }
@@ -393,6 +429,7 @@ public abstract class MFSyncApp extends AbstractMFApp<unimelb.mf.client.sync.set
             XmlStringWriter w = new XmlStringWriter();
             w.add("where", "namespace>='" + job.namespace() + "' and asset has content");
             w.add("action", "get-value");
+            w.add("count", true);
             w.add("size", settings().batchSize());
             w.add("idx", idx);
             w.add("xpath", new String[] { "ename", "path" },
@@ -416,6 +453,7 @@ public abstract class MFSyncApp extends AbstractMFApp<unimelb.mf.client.sync.set
                         settings().checkHandler(), _workers));
             }
             completed = re.longValue("cursor/remaining") == 0;
+            idx += settings().batchSize();
         } while (!completed && !Thread.interrupted());
     }
 
@@ -482,6 +520,7 @@ public abstract class MFSyncApp extends AbstractMFApp<unimelb.mf.client.sync.set
             }
             w.add("where", where);
             w.add("action", "get-value");
+            w.add("count", true);
             w.add("size", settings().batchSize());
             w.add("idx", idx);
             w.add("xpath", new String[] { "ename", "path" },
@@ -525,6 +564,7 @@ public abstract class MFSyncApp extends AbstractMFApp<unimelb.mf.client.sync.set
                             new AssetDownloadTask(session(), logger(), assetPath, file, settings().unarchive(), _dl));
                 }
             }
+            idx += settings().batchSize();
             completed = re.longValue("cursor/remaining") == 0;
         } while (!completed && !Thread.interrupted());
     }
@@ -578,7 +618,25 @@ public abstract class MFSyncApp extends AbstractMFApp<unimelb.mf.client.sync.set
                     settings().csumCheck(), settings().retry(), _ul, _workers));
             files.clear();
         }
+    }
 
+    private void syncDeleteAssets() throws Throwable {
+        List<Job> jobs = settings().jobs();
+        for (Job job : jobs) {
+            if (job.action() == Action.UPLOAD || job.action() == Action.SYNC) {
+                _queriers.submit(new SyncDeleteAssetsTask(session(), logger(), job, settings(), _nbDeletedAssets));
+            }
+        }
+    }
+
+    private void syncDeleteFiles() throws Throwable {
+        List<Job> jobs = settings().jobs();
+        for (Job job : jobs) {
+            if (job.action() == Action.DOWNLOAD || job.action() == Action.SYNC) {
+                _queriers.submit(
+                        new SyncDeleteFilesTask(session(), logger(), job, settings(), _workers, _nbDeletedFiles));
+            }
+        }
     }
 
     public void interrupt() {
