@@ -4,7 +4,7 @@
 
 	<groupId>au.edu.unimelb.mf</groupId>
 	<artifactId>unimelb-mf-clients</artifactId>
-	<version>0.0.4</version>
+	<version>0.0.5</version>
 	<packaging>jar</packaging>
 	<name>unimelb-mf-clients</name>
 	<url>https://github.com/UoM-ResPlat-DevOps/unimelb-mf-clients</url>

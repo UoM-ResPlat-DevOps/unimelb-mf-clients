@@ -1,0 +1,22 @@
+#!/bin/bash
+
+# check if java exists
+[[ -z $(which java) ]] && echo "Java is not found." >&2 && exit 1
+
+# unimelb-mf-clients/bin
+BIN=$(dirname ${BASH_SOURCE[0]})
+
+# current directory
+CWD=$(pwd)
+
+# unimelb-mf-clients/lib
+LIB=$(cd ${BIN}/../lib && pwd && cd ${CWD})
+
+# unimelb-mf-clients/lib/unimelb-mf-clients.jar
+JAR=${LIB}/unimelb-mf-clients.jar
+
+# check if unimelb-mf-clients.jar exists
+[[ ! -f $JAR ]] && echo "${JAR} is not found." >&2 && exit 2
+
+# execute the command
+java -cp "${JAR}" unimelb.mf.client.ssh.cli.SCPGetCLI ${1+"$@"}

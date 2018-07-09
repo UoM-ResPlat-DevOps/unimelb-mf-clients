@@ -1,0 +1,89 @@
+#!/bin/bash
+
+# where to download aterm.jar?
+ATERM_URL=https://mediaflux.vicnode.org.au/mflux/aterm.jar
+
+# where to save aterm.jar? 
+ATERM_HOME=$HOME/.Arcitecta
+
+# download function
+download() {
+    if [[ -z $(which curl) && -z $(which wget) ]]; then
+        echo "Error: cannot download aterm.jar. No curl or wget found." 1>&2
+        return 1
+    fi
+    local out="$1"
+    local url="$2"
+    if [[ ! -z $(which curl) ]]; then
+        curl -f --create-dirs -k -o "${out}" "${url}"
+    else
+        wget --no-check-certificate -O "${out}" "${url}"
+    fi
+    return $?
+}
+
+# check if java exists
+[[ -z $(which java) ]] && echo "Error: cannot find java." 1>&2 && exit 1
+
+# probe existing aterm.jar
+[[ -z $MFLUX_ATERM || ! -f $MFLUX_ATERM ]] && MFLUX_ATERM=./aterm.jar
+[[ -z $MFLUX_ATERM || ! -f $MFLUX_ATERM ]] && MFLUX_ATERM=${ATERM_HOME}/aterm.jar
+[[ -z $MFLUX_ATERM || ! -f $MFLUX_ATERM ]] && MFLUX_ATERM=$(dirname ${BASH_SOURCE[0]})/../lib/aterm.jar
+[[ -z $MFLUX_ATERM || ! -f $MFLUX_ATERM ]] && MFLUX_ATERM=$(dirname ${BASH_SOURCE[0]})/../aterm.jar
+[[ -z $MFLUX_ATERM || ! -f $MFLUX_ATERM ]] && MFLUX_ATERM=$(dirname ${BASH_SOURCE[0]})/aterm.jar
+[[ -z $MFLUX_ATERM || ! -f $MFLUX_ATERM ]] && MFLUX_ATERM=/opt/mediaflux/bin/aterm.jar
+
+# download aterm.jar
+if [[ -z $MFLUX_ATERM || ! -f $MFLUX_ATERM ]]; then
+    MFLUX_ATERM="${ATERM_HOME}/aterm.jar"
+    mkdir -p "${ATERM_HOME}"
+    CWD=$(pwd)
+    cd "${ATERM_HOME}"
+    download "${MFLUX_ATERM}" "${ATERM_URL}"
+    if [[ $? -ne 0 ]]; then
+        cd ${CWD}
+        echo "Error: failed to download aterm.jar" 1>&2 && exit 1
+    else
+        cd ${CWD}
+    fi
+fi
+    
+
+# probe existing mflux.cfg
+[[ -z $MFLUX_CFG || ! -f $MFLUX_CFG ]] && MFLUX_CFG=$./mflux.cfg
+[[ -z $MFLUX_CFG || ! -f $MFLUX_CFG ]] && MFLUX_CFG=${ATERM_HOME}/mflux.cfg
+[[ -z $MFLUX_CFG || ! -f $MFLUX_CFG ]] && MFLUX_CFG=$(dirname ${BASH_SOURCE[0]})/../mflux.cfg
+[[ -z $MFLUX_CFG || ! -f $MFLUX_CFG ]] && MFLUX_CFG=$(dirname ${BASH_SOURCE[0]})/mflux.cfg
+[[ -z $MFLUX_CFG || ! -f $MFLUX_CFG ]] && echo "Error: cannot find mflux.cfg." 1>&2 && exit 1
+
+
+# show usage if no arguments specified
+if [[ $# -eq 0 ]]; then
+    echo "Error: missing arguments." 1>&2
+    java -jar "-Dmf.cfg=$MFLUX_CFG" "$MFLUX_ATERM" nogui help download | sed 's/download:/aterm-download:/' | sed 's/download \[/aterm-download \[/'
+    exit 4
+fi
+
+# parse arguments
+ARGS=()
+ARGS+=("nogui")
+ARGS+=("download")
+while [[ $# -gt 0 ]]
+do
+case $1 in
+    -h|--help)
+    java -jar "-Dmf.cfg=$MFLUX_CFG" "$MFLUX_ATERM" nogui help download | sed 's/download:/aterm-download:/' | sed 's/download \[/aterm-download \[/'
+    exit 0
+    ;;
+    *)    
+    ARGS+=("$1")
+    shift
+    ;;
+esac
+done
+
+# restore arguments
+set -- "${ARGS[@]}"
+
+# execute download command via aterm
+java -jar "-Dmf.cfg=$MFLUX_CFG" "$MFLUX_ATERM" ${1+"$@"}

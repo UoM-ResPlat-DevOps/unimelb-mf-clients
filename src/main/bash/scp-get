@@ -1,8 +1,0 @@
-#!/bin/bash
-
-[[ -z $(which java) ]] && echo "Java is not found." >&2 && exit 1
-
-JAR=$(dirname $0)/unimelb-mf-clients.jar
-[[ ! -f $JAR ]] && echo "${JAR} is not found." >&2 && exit 2
-
-java -cp $JAR unimelb.mf.client.ssh.cli.SCPGetCLI ${1+"$@"}
