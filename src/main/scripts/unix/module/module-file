@@ -1,0 +1,16 @@
+#%Module1.0
+# unimelb-mf-clients modulefile
+#
+
+proc ModulesHelp { } {
+    puts stderr "This module does nothing but alert the user"
+    puts stderr "that the [module-info name] module is not available"
+}
+
+module-whatis "Notifies user that module is not available."
+set curMod [module-info name]
+if { [ module-info mode load ] } {
+    puts stderr "Note: '$curMod' is not available for [uname sysname]."
+}
+prereq Java
+break
