@@ -1,0 +1,160 @@
+#!/bin/bash
+
+# Default values for the script arguments
+EXPIRE_DAYS=14
+OVERWRITE=false
+VERBOSE=true
+
+# root namespace for cryo-em projects
+NAMESPACE_ROOT=/projects/cryo-em
+
+# aterm.jar download url
+ATERM_URL=https://mediaflux.vicnode.org.au/mflux/aterm.jar
+
+# function to print usage
+usage() {
+    echo ""
+	echo "Usage:"
+	echo "    $(basename $0) [-h|--help] [--expire-days <number-of-days>] [--ncsr <ncsr>] [--overwrite] [--quiet] <namespace>"
+	echo ""
+	echo "Options:"
+	echo "    -h | --help                       prints usage."
+	echo "    --email <addresses>               specify the email recipient of the generated url. Can be comma-separated if there are more than one."
+	echo "    --expire-days <number-of-days>    expiry of the auth token. Defaults to ${EXPIRE_DAYS} days."
+	echo "    --overwrite                       overwrite if output file exists."
+	echo "    --quiet                           do not print output message."
+	echo ""
+	echo "Positional arguments:"
+	echo "    <namespace>                       Mediaflux asset namespace to be downloaded by the scripts. Can be multiple, but must be from the same project."
+	echo ""
+	echo "Examples:"
+	echo "    $(basename $0) --email user1@unimelb.edu.au --expire-days 10 proj-abc-1128.4.999/RAW_DATA proj-abc-1128.4.999/PROCESSED_DATA"
+	echo ""
+}
+
+# check java
+[[ -z $(which java) ]] && echo "Error: cannot find java." 1>&2 && exit 1
+
+# check mflux.cfg
+[[ -z $MFLUX_CFG || ! -f $MFLUX_CFG ]] && MFLUX_CFG="./mflux.cfg"
+[[ -z $MFLUX_CFG || ! -f $MFLUX_CFG ]] && MFLUX_CFG="${HOME}/.Arcitecta/mflux.cfg"
+[[ -z $MFLUX_CFG || ! -f $MFLUX_CFG ]] && MFLUX_CFG="$(dirname ${BASH_SOURCE[0]})/../../config/mflux.cfg"
+[[ -z $MFLUX_CFG || ! -f $MFLUX_CFG ]] && MFLUX_CFG="$(dirname ${BASH_SOURCE[0]})/../../mflux.cfg"
+[[ -z $MFLUX_CFG || ! -f $MFLUX_CFG ]] && MFLUX_CFG="$(dirname ${BASH_SOURCE[0]})/mflux.cfg"
+[[ -z $MFLUX_CFG || ! -f $MFLUX_CFG ]] && echo "Error: cannot find ${HOME}/.Arcitecta/mflux.cfg." 1>&2 && exit 1
+
+# check aterm.jar
+[[ -z $MFLUX_ATERM || ! -f $MFLUX_ATERM ]] && MFLUX_ATERM="$(dirname ${BASH_SOURCE[0]})/../../lib/aterm.jar"
+[[ -z $MFLUX_ATERM || ! -f $MFLUX_ATERM ]] && MFLUX_ATERM="${HOME}/.Arcitecta/aterm.jar"
+[[ -z $MFLUX_ATERM || ! -f $MFLUX_ATERM ]] && MFLUX_ATERM=/opt/mediaflux/bin/aterm.jar
+[[ -z $MFLUX_ATERM || ! -f $MFLUX_ATERM ]] && MFLUX_ATERM=./aterm.jar
+
+
+# download aterm.jar
+if [[ -z $MFLUX_ATERM || ! -f $MFLUX_ATERM ]]; then
+    MFLUX_ATERM=${HOME}/.Arcitecta/aterm.jar
+    mkdir -p ${HOME}/.Arcitecta
+    CURL=$(which curl)
+    WGET=$(which wget)
+    [[ -z "${CURL}" && -z "${WGET}" ]] && echo "Error: cannot download aterm.jar. Found no curl or wget." 1>&2 && exit 1
+    if [[ ! -z "${CURL}" ]]; then
+        curl -f --create-dirs -k -o "$(dirname $0)/aterm.jar" "${ATERM_URL}"
+    else
+        wget --no-check-certificate -O "$(dirname $0)/aterm.jar" "${ATERM_URL}"
+    fi
+    if [[ $? -ne 0 ]]; then
+        echo "Error: failed to download aterm.jar"
+        exit 1
+    fi
+fi
+
+ATERM="java -jar -Dmf.cfg=$MFLUX_CFG $MFLUX_ATERM nogui"
+SERVICE=unimelb.asset.download.shell.script.url.create 
+COMMAND="${ATERM} ${SERVICE}"
+
+##
+## parse arguments
+##
+declare -a NAMESPACES=()
+declare -a EMAILS=()
+while [[ $# -gt 0 ]]
+do
+key="$1"
+case $key in
+    --expire-days)
+    EXPIRE_DAYS="$2"
+    shift
+    shift
+    ;;
+    --email)
+    IFS=',' read -r -a EMAILS <<< "$2"; unset IFS
+    shift
+    shift
+    ;;
+    --overwrite)
+    OVERWRITE=true
+    shift
+    ;;
+    --quiet)
+    VERBOSE=false
+    shift
+    ;;
+    -h|--help)
+    shift
+    usage && exit 0
+    ;;
+    *)
+    NAMESPACES+=("$1")
+    shift
+    ;;
+esac
+done
+
+if [[ ${#NAMESPACES[@]} -eq 0 ]]; then
+    echo "Error: no Mediaflux asset namespace(directory) is specified." 1>&2
+    usage
+    exit 1
+fi
+
+COMMAND="${COMMAND} :download <"
+for ns in "${NAMESPACES[@]}"
+do
+    if [[ "${ns}" =~ ^${NAMESPACE_ROOT}/.* ]]; then
+        path=${ns#$NAMESPACE_ROOT/} # remove leading root namespace
+        IFS='/' read -r -a array <<< "${path}"
+        prj="${array[0]}"
+    else
+        path=${ns#*/}   # remove leading slash
+        IFS='/' read -r -a array <<< "${path}"
+        prj="${array[0]}"
+        ns="${NAMESPACE_ROOT}/${path}" # get full path of the namespace
+    fi
+    if [[ -z ${PROJECT} ]]; then
+        PROJECT=${prj}
+        ROLE="${PROJECT}:participant-a"
+        ROLE_NAMESPACE="${PROJECT}:"
+    else
+        if [[ ${prj} != ${PROJECT} ]]; then
+            echo "Error: you cannot specify namespaces from multiple projects." 1>&2
+            usage
+            exit 1
+        fi
+    fi
+    COMMAND="${COMMAND} :namespace ${ns}"
+done
+COMMAND="${COMMAND} :token < :role -type role ${ROLE} :to now+${EXPIRE_DAYS}day > :verbose ${VERBOSE} :overwrite ${OVERWRITE}"
+COMMAND="${COMMAND} >"
+
+COMMAND="${COMMAND} :token < :perm < :resource -type role:namespace ${ROLE_NAMESPACE} :access ADMINISTER > >"
+
+if [[ ${#EMAILS[@]} -gt 0 ]]; then
+    COMMAND="${COMMAND} :email < "
+    for email in "${EMAILS[@]}"
+    do
+        COMMAND="${COMMAND} :to ${email}"
+    done
+    COMMAND="${COMMAND} >"
+fi
+
+# execute the command to generate the url
+${COMMAND}

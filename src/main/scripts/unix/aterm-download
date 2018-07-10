@@ -26,9 +26,9 @@ download() {
 [[ -z $(which java) ]] && echo "Error: cannot find java." 1>&2 && exit 1
 
 # probe existing aterm.jar
+[[ -z $MFLUX_ATERM || ! -f $MFLUX_ATERM ]] && MFLUX_ATERM=$(dirname ${BASH_SOURCE[0]})/../lib/aterm.jar
 [[ -z $MFLUX_ATERM || ! -f $MFLUX_ATERM ]] && MFLUX_ATERM=./aterm.jar
 [[ -z $MFLUX_ATERM || ! -f $MFLUX_ATERM ]] && MFLUX_ATERM=${ATERM_HOME}/aterm.jar
-[[ -z $MFLUX_ATERM || ! -f $MFLUX_ATERM ]] && MFLUX_ATERM=$(dirname ${BASH_SOURCE[0]})/../lib/aterm.jar
 [[ -z $MFLUX_ATERM || ! -f $MFLUX_ATERM ]] && MFLUX_ATERM=$(dirname ${BASH_SOURCE[0]})/../aterm.jar
 [[ -z $MFLUX_ATERM || ! -f $MFLUX_ATERM ]] && MFLUX_ATERM=$(dirname ${BASH_SOURCE[0]})/aterm.jar
 [[ -z $MFLUX_ATERM || ! -f $MFLUX_ATERM ]] && MFLUX_ATERM=/opt/mediaflux/bin/aterm.jar
@@ -52,9 +52,10 @@ fi
 # probe existing mflux.cfg
 [[ -z $MFLUX_CFG || ! -f $MFLUX_CFG ]] && MFLUX_CFG=$./mflux.cfg
 [[ -z $MFLUX_CFG || ! -f $MFLUX_CFG ]] && MFLUX_CFG=${ATERM_HOME}/mflux.cfg
+[[ -z $MFLUX_CFG || ! -f $MFLUX_CFG ]] && MFLUX_CFG=$(dirname ${BASH_SOURCE[0]})/../config/mflux.cfg
 [[ -z $MFLUX_CFG || ! -f $MFLUX_CFG ]] && MFLUX_CFG=$(dirname ${BASH_SOURCE[0]})/../mflux.cfg
 [[ -z $MFLUX_CFG || ! -f $MFLUX_CFG ]] && MFLUX_CFG=$(dirname ${BASH_SOURCE[0]})/mflux.cfg
-[[ -z $MFLUX_CFG || ! -f $MFLUX_CFG ]] && echo "Error: cannot find mflux.cfg." 1>&2 && exit 1
+[[ -z $MFLUX_CFG || ! -f $MFLUX_CFG ]] && echo "Error: cannot find ${ATERM_HOME}/mflux.cfg." 1>&2 && exit 1
 
 
 # show usage if no arguments specified
