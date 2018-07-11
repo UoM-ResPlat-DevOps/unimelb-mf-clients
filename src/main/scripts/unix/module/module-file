@@ -1,16 +1,52 @@
 #%Module1.0
+#
 # unimelb-mf-clients modulefile
 #
 
+#################################################################################
+# Installation:                                                                 #
+#                                                                               #
+#     1) You must install unimelb-mf-clients first.                             #
+#     2) You must validate the root directory of unimelb-mf-clients in this     #
+#        module file, and correct it if invalid.                                #
+#     3) You must validate the Java module name and correct it if needed.       #
+#     4) You need to install this module file to a directory included in        #
+#        $MODULEPATH environment variable. Otherwise you need to add the        #
+#        (parent) directory of module file directory to $MODULEPATH, suppose    #
+#        you install the module file to $HOME/.modules/unimelb-mf-clients/0.0.5 #
+#        where 0.0.5 is the module file name, you can use the commands below:   #
+#                                                                               #
+#            mkdir -p $HOME/.modules/unimelb-mf-clients                         #
+#            cp bin/module/module-file $HOME/.modules/unimelb-mf-clients/0.0.5  #
+#            module use $HOME/.modules/unimelb-mf-clients/0.0.5                 #
+#                                                                               #
+#                                                                               #
+#     5) Now you should be able to load the module:                             #
+#            module load unimelb-mf-clients                                     #
+#################################################################################
+
 proc ModulesHelp { } {
-    puts stderr "This module does nothing but alert the user"
-    puts stderr "that the [module-info name] module is not available"
+    puts stderr "This module 1) prepend unimelb-mf-clients/bin to PATH environment variable;"
+    puts stderr "            2) check and load pre-requisite Java module."
 }
 
-module-whatis "Notifies user that module is not available."
-set curMod [module-info name]
-if { [ module-info mode load ] } {
-    puts stderr "Note: '$curMod' is not available for [uname sysname]."
-}
-prereq Java
-break
+
+module-whatis "Module to setup environment for unimelb-mf-clients."
+
+# make sure it does not load more than once
+conflict unimelb-mf-clients
+
+# load java module (NOTE: you may need to change "Java" to the actual Java module name if it differs.)
+module load Java
+
+# the root directory (NOTE: you need to change it to the actual installed directory.)
+set root /home/wliu5/unimelb-mf-clients-0.0.5
+
+# set PATH environment variable
+prepend-path PATH $root/bin
+
+# export environment variable: MFLUX_ATERM (This is optional.)
+setenv MFLUX_ATERM $root/lib/aterm.jar
+
+
+

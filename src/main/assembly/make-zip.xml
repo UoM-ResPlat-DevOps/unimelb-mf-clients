@@ -21,7 +21,7 @@
 			<outputDirectory>${project.artifactId}-${project.version}/bin</outputDirectory>
 		</fileSet>
 		<fileSet>
-			<fileMode>0755</fileMode>
+			<fileMode>0644</fileMode>
 			<directory>src/main/scripts/windows</directory>
 			<outputDirectory>${project.artifactId}-${project.version}/bin</outputDirectory>
 		</fileSet>
