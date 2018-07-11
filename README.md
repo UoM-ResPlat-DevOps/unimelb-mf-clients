@@ -54,23 +54,23 @@ A command line tool to execute Mediaflux service to export Mediaflux assets to r
 ### 1. aterm
 **aterm** (or **aterm.cmd** on Windows) is a script provides a command line Mediaflux terminal. Via **aterm** you can execute any Mediaflux service or built-in commands. (e.g. **download**, **import**, **source**)
 
-  * [User guide for aterm](https://github.com/UoM-ResPlat-DevOps/unimelb-mf-scripts/blob/master/docs/aterm.md)
+  * [User guide for aterm](https://github.com/UoM-ResPlat-DevOps/unimelb-mf-clients/blob/master/docs/aterm.md)
 
 ### 2. aterm-download
 **aterm-download** (or **aterm-download.cmd** on Windows) script provides a command line tool to download data from Mediaflux server. 
 
-  * [User guide for aterm-download](https://github.com/UoM-ResPlat-DevOps/unimelb-mf-scripts/blob/master/docs/aterm-download.md)
+  * [User guide for aterm-download](https://github.com/UoM-ResPlat-DevOps/unimelb-mf-clients/blob/master/docs/aterm-download.md)
 
 ### 3. aterm-import
 **aterm-import** (or **aterm-import.cmd** on Windows) script is a command line tool to import(upload) local data files into Mediaflux server. 
 
-  * [User guide for aterm-import](https://github.com/UoM-ResPlat-DevOps/unimelb-mf-scripts/blob/master/docs/aterm-import.md)
+  * [User guide for aterm-import](https://github.com/UoM-ResPlat-DevOps/unimelb-mf-clients/blob/master/docs/aterm-import.md)
 
 ## III. Domain Specific Scripts
 
 ### 1. Scripts for CryoEM data management in Mediaflux
-  * [cryoem-download-aterm-script-url-create](https://github.com/UoM-ResPlat-DevOps/unimelb-mf-scripts/blob/master/docs/cryo-em/cryoem-download-aterm-script-url-create.md)
-  * [cryoem-download-shell-script-url-create](https://github.com/UoM-ResPlat-DevOps/unimelb-mf-scripts/blob/master/docs/cryo-em/cryoem-download-shell-script-url-create.md)
+  * [cryoem-download-aterm-script-url-create](https://github.com/UoM-ResPlat-DevOps/unimelb-mf-clients/blob/master/docs/cryo-em/cryoem-download-aterm-script-url-create.md)
+  * [cryoem-download-shell-script-url-create](https://github.com/UoM-ResPlat-DevOps/unimelb-mf-clients/blob/master/docs/cryo-em/cryoem-download-shell-script-url-create.md)
 
 
 
