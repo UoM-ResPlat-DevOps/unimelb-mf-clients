@@ -40,7 +40,7 @@ conflict unimelb-mf-clients
 module load Java
 
 # the root directory (NOTE: you need to change it to the actual installed directory.)
-set root /home/wliu5/unimelb-mf-clients-0.0.5
+set root /opt/unimelb-mf-clients-0.0.5
 
 # set PATH environment variable
 prepend-path PATH $root/bin/unix
