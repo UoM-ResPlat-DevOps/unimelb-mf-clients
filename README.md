@@ -69,9 +69,8 @@ A command line tool to execute Mediaflux service to export Mediaflux assets to r
 ## III. Domain Specific Scripts
 
 ### 1. Scripts for CryoEM data management in Mediaflux
-  1) [cryoem-download-aterm-script-url-create](https://github.com/UoM-ResPlat-DevOps/unimelb-mf-scripts/blob/master/docs/cryo-em/cryoem-download-aterm-script-url-create.md)
-
-  2) [cryoem-download-shell-script-url-create](https://github.com/UoM-ResPlat-DevOps/unimelb-mf-scripts/blob/master/docs/cryo-em/cryoem-download-shell-script-url-create.md)
+  * [cryoem-download-aterm-script-url-create](https://github.com/UoM-ResPlat-DevOps/unimelb-mf-scripts/blob/master/docs/cryo-em/cryoem-download-aterm-script-url-create.md)
+  * [cryoem-download-shell-script-url-create](https://github.com/UoM-ResPlat-DevOps/unimelb-mf-scripts/blob/master/docs/cryo-em/cryoem-download-shell-script-url-create.md)
 
 
 
