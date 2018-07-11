@@ -6,11 +6,11 @@ This is a shell script to execute **unimelb.asset.download.shell.script.create**
 
 1. Run the following command in Linux terminal to download the script
 ```
-wget https://raw.githubusercontent.com/UoM-ResPlat-DevOps/unimelb-mf-scripts/master/unix/cryo-em/cryoem-download-shell-script-url-create
+wget https://raw.githubusercontent.com/UoM-ResPlat-DevOps/unimelb-mf-clients/master/scripts/unix/cryo-em/cryoem-download-shell-script-url-create
 ```
 or if you are on Mac OS and wget is not available, run the following command in terminal:
 ```
-curl -o cryoem-download-shell-script-url-create https://raw.githubusercontent.com/UoM-ResPlat-DevOps/unimelb-mf-scripts/master/unix/cryo-em/cryoem-download-shell-script-url-create
+curl -o cryoem-download-shell-script-url-create https://raw.githubusercontent.com/UoM-ResPlat-DevOps/unimelb-mf-clients/master/scripts/unix/cryo-em/cryoem-download-shell-script-url-create
 ```
 2. Set the script to be executable
 ```
