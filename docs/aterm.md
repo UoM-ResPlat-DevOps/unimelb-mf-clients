@@ -6,15 +6,15 @@ It requires file: **aterm.jar**, which can be downloaded by this script automati
 ## 1. Configuration
 
 ### aterm.jar
-* The script downloads **aterm.jar** automatically to script directory.
-* You can modify the script to specify a different location:
+* This script downloads **aterm.jar** automatically to $HOME/.Arcitecta directory, if $MFLUX_ATERM environment variable is not set or aterm.jar is not found.
+* You can set environment variable to specify a different location before execute this script:
   * on Linux/Mac OS/Unix, modify aterm file:
     * **export MFLUX_ATERM=/path/to/aterm.jar**
   * on Windows, modify aterm.cmd file:
     * **SET MFLUX_ATERM=x:\path\to\aterm.jar**
 
 ### mflux.cfg
-* You **must** specify the Mediaflux server details and user credentails (or secure identity token) in the **mflux.cfg** file.
+* You **must** specify the Mediaflux server details and user credentails (or secure identity token) in a **mflux.cfg** file.
 * the script will try the following locations to find **mflux.cfg**:
   1. use the file specified by **$MFLUX_CFG** (or **%MFLUX_CFG%** on Windows) if the file exists;
   2. use the file in **$HOME/.Arcitecta/mflux.cfg** (or **%USERPROFILE%/Arcitecta/mflux.cfg**) if the file exists
