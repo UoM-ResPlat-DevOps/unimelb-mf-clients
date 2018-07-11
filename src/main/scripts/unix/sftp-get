@@ -10,7 +10,7 @@ BIN=$(dirname ${BASH_SOURCE[0]})
 CWD=$(pwd)
 
 # unimelb-mf-clients/lib
-LIB=$(cd ${BIN}/../lib && pwd && cd ${CWD})
+LIB=$(cd ${BIN}/../../lib && pwd && cd ${CWD})
 
 # unimelb-mf-clients/lib/unimelb-mf-clients.jar
 JAR=${LIB}/unimelb-mf-clients.jar

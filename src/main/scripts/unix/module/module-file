@@ -43,7 +43,7 @@ module load Java
 set root /home/wliu5/unimelb-mf-clients-0.0.5
 
 # set PATH environment variable
-prepend-path PATH $root/bin
+prepend-path PATH $root/bin/unix
 
 # export environment variable: MFLUX_ATERM (This is optional.)
 setenv MFLUX_ATERM $root/lib/aterm.jar

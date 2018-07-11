@@ -18,12 +18,12 @@
 		<fileSet>
 			<fileMode>0755</fileMode>
 			<directory>src/main/scripts/unix</directory>
-			<outputDirectory>${project.artifactId}-${project.version}/bin</outputDirectory>
+			<outputDirectory>${project.artifactId}-${project.version}/bin/unix</outputDirectory>
 		</fileSet>
 		<fileSet>
 			<fileMode>0644</fileMode>
 			<directory>src/main/scripts/windows</directory>
-			<outputDirectory>${project.artifactId}-${project.version}/bin</outputDirectory>
+			<outputDirectory>${project.artifactId}-${project.version}/bin/windows</outputDirectory>
 		</fileSet>
 	</fileSets>
 </assembly>

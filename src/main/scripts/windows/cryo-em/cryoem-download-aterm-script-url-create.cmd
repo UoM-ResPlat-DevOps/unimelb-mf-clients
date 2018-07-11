@@ -15,7 +15,7 @@ REM aterm.jar download url
 set ATERM_URL=https://mediaflux.vicnode.org.au/mflux/aterm.jar
 
 REM aterm.jar location
-if [%MFLUX_ATERM%]==[] set "MFLUX_ATERM=%~dp0..\..\lib\aterm.jar"
+if [%MFLUX_ATERM%]==[] set "MFLUX_ATERM=%~dp0..\..\..\lib\aterm.jar"
 if not exist "%MFLUX_ATERM%" (
     set "MFLUX_ATERM=%USERPROFILE%\.Arcitecta\aterm.jar"
     if not exist %USERPROFILE%\.Arcitecta\NUL mkdir "%USERPROFILE%\.Arcitecta"
@@ -25,8 +25,8 @@ if not exist "%MFLUX_ATERM%" (
 
 REM mflux.cfg location
 if [%MFLUX_CFG%]==[] set "MFLUX_CFG=%USERPROFILE%\.Arcitecta\mflux.cfg" 
-if not exist "%MFLUX_CFG%" set "MFLUX_CFG=%~dp0..\..\config\mflux.cfg"
-if not exist "%MFLUX_CFG%" set "MFLUX_CFG=%~dp0..\..\mflux.cfg"
+if not exist "%MFLUX_CFG%" set "MFLUX_CFG=%~dp0..\..\..\config\mflux.cfg"
+if not exist "%MFLUX_CFG%" set "MFLUX_CFG=%~dp0..\..\..\mflux.cfg"
 if not exist "%MFLUX_CFG%" set "MFLUX_CFG=%~dp0mflux.cfg"
 if not exist "%MFLUX_CFG%" (
     set "MFLUX_CFG=%USERPROFILE%\.Arcitecta\mflux.cfg"

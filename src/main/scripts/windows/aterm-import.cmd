@@ -16,13 +16,13 @@ IF %ERRORLEVEL% NEQ 0 (
 
 REM check if mflux.cfg exists
 IF [%MFLUX_CFG%]==[] SET MFLUX_CFG=%ATERM_HOME%\mflux.cfg
-IF NOT EXIST %MFLUX_CFG% SET MFLUX_CFG=%~dp0..\config\mflux.cfg
+IF NOT EXIST %MFLUX_CFG% SET MFLUX_CFG=%~dp0..\..\config\mflux.cfg
 IF NOT EXIST %MFLUX_CFG% (
     ECHO File: %MFLUX_CFG% does not exist && EXIT /B 1
 )
 
 REM check if aterm.jar exists
-IF [%MFLUX_ATERM%]==[] SET MFLUX_ATERM=%~dp0..\lib\aterm.jar
+IF [%MFLUX_ATERM%]==[] SET MFLUX_ATERM=%~dp0..\..\lib\aterm.jar
 IF NOT EXIST %MFLUX_ATERM% SET MFLUX_ATERM=%MFLUX_HOME%\aterm.jar
 
 REM try downloading aterm.jar with PowerShell
