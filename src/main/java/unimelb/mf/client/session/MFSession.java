@@ -1,5 +1,6 @@
 package unimelb.mf.client.session;
 
+import java.io.Console;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Timer;
@@ -100,6 +101,48 @@ public class MFSession {
             if (cxn != null) {
                 cxn.close();
             }
+        }
+    }
+
+    public void doConsoleLogon() throws Throwable {
+        Console console = System.console();
+        if (console == null) {
+            throw new UnsupportedOperationException("Failed to open system console");
+        }
+        if (_settings.serverHost() == null) {
+            _settings.readServerHostFromConsole(console);
+        } else {
+            console.printf("Host: %s%n", _settings.serverHost());
+        }
+        if (_settings.serverPort() <= 0) {
+            _settings.readServerPortFromConsole(console);
+        } else {
+            console.printf("Port: %d%n", _settings.serverPort());
+        }
+        if (_settings.serverTransport() == null) {
+            _settings.readServerTransportFromConsole(console);
+        } else {
+            console.printf("Transport: %s%n", _settings.serverTransport());
+        }
+        if (_settings.domain() == null) {
+            _settings.readDomainFromConsole(console);
+        } else {
+            console.printf("Domain: %s%n", _settings.domain());
+        }
+        if (_settings.user() == null) {
+            _settings.readUserFromConsole(console);
+        } else {
+            console.printf("User: %s%n", _settings.user());
+        }
+        _settings.readPasswordFromConsole(console);
+
+        try {
+            testAuthentication();
+        } catch (Throwable e) {
+            console.printf("%n");
+            console.printf("Error: %s%n", e.getMessage());
+            console.printf("%n");
+            doConsoleLogon();
         }
     }
 

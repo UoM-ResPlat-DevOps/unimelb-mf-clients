@@ -90,6 +90,7 @@ public class MFDownload extends MFSyncApp {
     protected void parseArgs(String[] args) throws Throwable {
         if (_connectionSettings == null) {
             _connectionSettings = new MFConnectionSettings();
+            _connectionSettings.findAndLoadFromConfigFile();
         }
         if (args != null) {
             try {
@@ -124,15 +125,14 @@ public class MFDownload extends MFSyncApp {
         }
 
         /*
-         * validate MF connection settings locally
-         */
-        _connectionSettings.validate();
-
-        /*
          * test MF authentication
          */
         MFSession session = new MFSession(_connectionSettings);
-        session.testAuthentication();
+        if (_connectionSettings.hasMissingArgument()) {
+            session.doConsoleLogon();
+        } else {
+            session.testAuthentication();
+        }
 
         /*
          * set MF session
@@ -184,7 +184,7 @@ public class MFDownload extends MFSyncApp {
     }
 
     protected int parseDownloadOptions(String[] args, int i) throws Throwable {
-        if ("--out".equalsIgnoreCase(args[i])) {
+        if ("--out".equalsIgnoreCase(args[i]) || "-o".equalsIgnoreCase(args[i])) {
             _rootDir = Paths.get(args[i + 1]).toAbsolutePath();
             if (!Files.exists(_rootDir)) {
                 throw new IllegalArgumentException("Directory: " + args[i] + " does not exist.");

@@ -2,6 +2,7 @@ package unimelb.mf.client.session;
 
 import java.io.BufferedInputStream;
 import java.io.BufferedReader;
+import java.io.Console;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileReader;
@@ -20,6 +21,11 @@ import arc.xml.XmlDoc;
  *
  */
 public class MFConnectionSettings {
+
+    public static final String DEFAULT_MFLUX_CFG_FILE = System.getProperty("user.home") + File.separator + ".Arcitecta"
+            + File.separator + "mflux.cfg";
+    public static final String ENV_MFLUX_CFG = "MFLUX_CFG";
+    public static final String PROPERTY_MF_CONFIG = "mf.config";
 
     private String _serverHost = null;
     private String _serverTransport = null;
@@ -42,7 +48,7 @@ public class MFConnectionSettings {
     }
 
     public MFConnectionSettings(Path xmlFile) throws Throwable {
-        this(xmlFile.toFile());
+        this(xmlFile == null ? null : xmlFile.toFile());
     }
 
     public MFConnectionSettings(File xmlFile) throws Throwable {
@@ -181,8 +187,35 @@ public class MFConnectionSettings {
         return this;
     }
 
+    public MFConnectionSettings readDomainFromConsole(Console console) {
+        String domain = null;
+        do {
+            domain = _domain == null ? console.readLine("Domain: ") : console.readLine("Domain[%s]: ", _domain);
+            if (_domain != null && domain != null && domain.trim().isEmpty()) {
+                // use existing value, no change
+                return this;
+            }
+        } while (domain == null || domain.trim().isEmpty());
+
+        _domain = domain.trim();
+        return this;
+    }
+
     public MFConnectionSettings setPassword(String password) {
         _password = password;
+        return this;
+    }
+
+    public MFConnectionSettings readPasswordFromConsole(Console console) {
+        String password = null;
+        do {
+            char[] pwd = console.readPassword("Password: ");
+            if (pwd != null && pwd.length > 0) {
+                password = new String(pwd);
+            }
+        } while (password == null || password.trim().isEmpty());
+
+        _password = password.trim();
         return this;
     }
 
@@ -209,13 +242,77 @@ public class MFConnectionSettings {
         return this;
     }
 
+    public MFConnectionSettings readServerHostFromConsole(Console console) {
+        String host = null;
+        do {
+            host = _serverHost == null ? console.readLine("Host: ") : console.readLine("Host[%s]: ", _serverHost);
+            if (_serverHost != null && host != null && host.trim().isEmpty()) {
+                // use existing value, no change
+                return this;
+            }
+        } while (host == null || host.trim().isEmpty());
+
+        _serverHost = host.trim();
+        return this;
+    }
+
     public MFConnectionSettings setServerPort(int port) {
+        _serverPort = port;
+        return this;
+    }
+
+    public MFConnectionSettings readServerPortFromConsole(Console console) {
+        int port = -1;
+        do {
+            String p = _serverPort <= 0 ? console.readLine("Port: ") : console.readLine("Port[%d]: ", _serverPort);
+            if (_serverPort > 0 && p != null && p.trim().isEmpty()) {
+                // use existing value, no change
+                return this;
+            }
+            if (p != null && !p.trim().isEmpty()) {
+                try {
+                    port = Integer.parseInt(p.trim());
+                } catch (NumberFormatException e) {
+                    console.printf("%n");
+                    console.printf("Invalid port: %s Expects a number in between 1 and 65535.", p.trim());
+                    console.printf("%n");
+                    port = -1;
+                }
+            }
+        } while (port <= 0 || port > 65535);
+
         _serverPort = port;
         return this;
     }
 
     public MFConnectionSettings setServerTransport(String transport) throws Exception {
         _serverTransport = parseServerTransport(transport);
+        return this;
+    }
+
+    public MFConnectionSettings readServerTransportFromConsole(Console console) {
+        String transport = null;
+        do {
+            transport = _serverTransport == null ? console.readLine("Transport(https/http/tcpip): ")
+                    : console.readLine("Transport[%s]: ", _serverTransport);
+            if (_serverTransport != null && transport != null && transport.trim().isEmpty()) {
+                // use existing value, no change
+                return this;
+            }
+            if (transport != null) {
+                transport = transport.trim();
+                if (!transport.equalsIgnoreCase("http") && !transport.equalsIgnoreCase("https")
+                        && !transport.toLowerCase().startsWith("tcp")) {
+                    // invalid value
+                    console.printf("%n");
+                    console.printf("Invalid transport: %s. Expects http, https or tcp/ip%n", transport);
+                    console.printf("%n");
+                    transport = null;
+                }
+            }
+        } while (transport == null || transport.isEmpty());
+
+        _serverTransport = transport;
         return this;
     }
 
@@ -231,6 +328,20 @@ public class MFConnectionSettings {
 
     public MFConnectionSettings setUser(String user) {
         _user = user;
+        return this;
+    }
+
+    public MFConnectionSettings readUserFromConsole(Console console) {
+        String user = null;
+        do {
+            user = _user == null ? console.readLine("User: ") : console.readLine("User[%s]: ", _user);
+            if (_user != null && user != null && user.trim().isEmpty()) {
+                // use existing value, no change
+                return this;
+            }
+        } while (user == null || user.trim().isEmpty());
+
+        _user = user.trim();
         return this;
     }
 
@@ -289,7 +400,7 @@ public class MFConnectionSettings {
         return _executeRetryInterval;
     }
 
-    public void validate() throws Throwable {
+    public void checkMissingArguments() throws Throwable {
         if (_serverHost == null) {
             throw new IllegalArgumentException("Missing mf.host");
         }
@@ -304,10 +415,29 @@ public class MFConnectionSettings {
         }
     }
 
+    public boolean hasMissingArgument() {
+        if (_serverHost == null) {
+            return true;
+        }
+        if (_serverPort <= 0) {
+            return true;
+        }
+        if (serverTransport() == null) {
+            return true;
+        }
+        if (_token == null && (_domain == null || _user == null || _password == null) && _sessionKey == null) {
+            return true;
+        }
+        return false;
+    }
+
     public void loadFromConfigFile(String configFile) throws Exception {
-        File cf = new File(configFile);
+        loadFromConfigFile(new File(configFile));
+    }
+
+    public void loadFromConfigFile(File configFile) throws Exception {
         Properties props = new Properties();
-        InputStream in = new BufferedInputStream(new FileInputStream(cf));
+        InputStream in = new BufferedInputStream(new FileInputStream(configFile));
         try {
             props.load(in);
             if (props.containsKey("host")) {
@@ -335,6 +465,76 @@ public class MFConnectionSettings {
         } finally {
             in.close();
         }
+    }
+
+    // @formatter:off
+    /**
+     * Try finding mflux.cfg file in the following order:
+     *     1. try system property: mf.config
+     *     2. try system environment variable: MFLUX_CFG
+     *     3. try default location: $HOME/.Arcitecta/mflux.cfg
+     * @return the absolute path of the configuration file. if not found, return null.
+     * @throws Throwable
+     */
+    // @formatter:on
+    public String findAndLoadFromConfigFile() throws Throwable {
+        String cfgFile = System.getProperty(PROPERTY_MF_CONFIG);
+
+        /*
+         * try system property: mf.config
+         */
+        if (cfgFile != null) {
+            File f = new File(cfgFile);
+            if (f.exists()) {
+                loadFromConfigFile(f);
+                return f.getAbsolutePath();
+            }
+        }
+
+        /*
+         * try system environment variable: MFLUX_CFG
+         */
+        cfgFile = System.getenv(ENV_MFLUX_CFG);
+        if (cfgFile != null) {
+            File f = new File(cfgFile);
+            if (f.exists()) {
+                loadFromConfigFile(f);
+                return f.getAbsolutePath();
+            }
+        }
+
+        /*
+         * try default location: $HOME/.Arcitecta/mflux.cfg
+         */
+        cfgFile = DEFAULT_MFLUX_CFG_FILE;
+        if (cfgFile != null) {
+            File f = new File(cfgFile);
+            if (f.exists()) {
+                loadFromConfigFile(f);
+                return f.getAbsolutePath();
+            }
+        }
+        return null;
+    }
+
+    /**
+     * Load the specified Mediaflux configuration file. If the specified file is
+     * null or the file is not found. Try finding and loading the file specified
+     * in 1) system property; 2) system environment variable 3) default
+     * location: $HOME/.Arcitecta/mflux.cfg
+     * 
+     * @param configFile
+     * @throws Throwable
+     */
+    public String loadFromConfigFileOrFind(String configFile) throws Throwable {
+        if (configFile != null) {
+            File cfgFile = new File(configFile);
+            if (cfgFile.exists()) {
+                loadFromConfigFile(cfgFile);
+                return cfgFile.getAbsolutePath();
+            }
+        }
+        return findAndLoadFromConfigFile();
     }
 
 }

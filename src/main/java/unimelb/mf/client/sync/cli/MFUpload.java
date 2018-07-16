@@ -87,6 +87,7 @@ public class MFUpload extends MFSyncApp {
     protected void parseArgs(String[] args) throws Throwable {
         if (_connectionSettings == null) {
             _connectionSettings = new MFConnectionSettings();
+            _connectionSettings.findAndLoadFromConfigFile();
         }
         if (args != null) {
             try {
@@ -127,16 +128,16 @@ public class MFUpload extends MFSyncApp {
             throw new IllegalArgumentException("Missing source directory.");
         }
 
-        /*
-         * validate MF connection settings locally
-         */
-        _connectionSettings.validate();
 
         /*
          * test MF authentication
          */
         MFSession session = new MFSession(_connectionSettings);
-        session.testAuthentication();
+        if (_connectionSettings.hasMissingArgument()) {
+            session.doConsoleLogon();
+        } else {
+            session.testAuthentication();
+        }
 
         /*
          * set MF session
