@@ -9,7 +9,9 @@ A set of command line utilities to manipulate data in Mediaflux . It consists of
   * It is the configuration file for specifying Mediaflux connection details and user credentails. See sample [mflux.cfg](https://github.com/UoM-ResPlat-DevOps/unimelb-mf-clients/blob/master/src/main/config/samples/mflux.cfg) file.
   * All the command line utitlities below supports it;
   * To specify the location of **mflux.cfg** file, try one of the approaches below:
-    - put **mflux.cfg** into **$HOME/.Arcitecta/mflux.cfg** if on Unix(Linux/Mac/BSD), or **%userprofile%\.Arcitecta\mflux.cfg** if on Windows.
+    - put **mflux.cfg** into the default location:
+      * On Unix, save it to **$HOME/.Arcitecta/mflux.cfg** 
+      * On Windows, save it to **%userprofile%\.Arcitecta\mflux.cfg**
     - or set environment variable MFLUX_CFG to be the location of the file before execute the command:
       * On Unix, `export MFLUX_CFG=/path/to/mflux.cfg` 
       * On Windows, `setx MFLUX_CFG=X:\path\to\mflux.cfg`
