@@ -17,6 +17,7 @@ import java.util.Set;
 import arc.xml.XmlDoc;
 import unimelb.mf.client.session.MFSession;
 import unimelb.mf.client.sync.check.CheckHandler;
+import unimelb.mf.client.sync.settings.Action.Direction;
 import unimelb.mf.client.sync.task.AssetDownloadTask;
 import unimelb.mf.client.sync.task.AssetDownloadTask.Unarchive;
 import unimelb.mf.client.task.MFApp;
@@ -329,7 +330,8 @@ public class Settings implements MFApp.Settings {
         if (xmlFile != null) {
             Reader r = new BufferedReader(new FileReader(xmlFile.toFile()));
             try {
-                XmlDoc.Element se = new XmlDoc().parse(r).element("properties/sync/settings");
+                XmlDoc.Element pe = new XmlDoc().parse(r).element("properties");
+                XmlDoc.Element se = pe.element("sync/settings");
                 if (se == null) {
                     throw new Exception("element properties/sync/settings is not found.");
                 }
@@ -385,6 +387,63 @@ public class Settings implements MFApp.Settings {
                     if (emails != null) {
                         for (String email : emails) {
                             addRecipients(email);
+                        }
+                    }
+                }
+
+                // Add jobs
+                List<XmlDoc.Element> jes = pe.elements("sync/job");
+                if (jes != null) {
+                    for (XmlDoc.Element je : jes) {
+                        // TODO support project id and include/exclude
+                        // patterns...
+
+                        // @formatter:off
+                        Action action = Action.fromString(je.value("@action"));
+                        if (action == null) {
+                            System.err.println("Warning: Invalid job found in the XML configuration file. Missing or invalid @action attribute.");
+                            continue;
+//                            throw new IllegalArgumentException(
+//                                    "Invalid job found in the XML configuration file. Missing or invalid @action attribute.");
+                        }
+                        String ns = je.value("namespace");
+                        if (ns == null) {
+                            System.err.println("Warning: Invalid job found in the XML configuration file. Missing namespace element.");
+                            continue;
+//                            throw new IllegalArgumentException(
+//                                    "Invalid job found in the XML configuration file. Missing namespace element.");
+                        }
+                        
+                        
+                        String dir = je.value("directory");
+                        if (dir == null) {
+                            System.err.println("Warning: Invalid job found in the XML configuration file. Missing directory element.");
+                            continue;
+//                            throw new IllegalArgumentException(
+//                                    "Invalid job found in the XML configuration file. Missing directory element.");
+                        }
+                        //@formatter:on
+
+                        boolean isNSParent = action.direction() != Direction.DOWN
+                                ? je.booleanValue("namespace/@parent", false)
+                                : false;
+                        boolean isDirParent = action.direction() != Direction.UP
+                                ? je.booleanValue("directory/@parent", false)
+                                : false;
+
+                        switch (action.direction()) {
+                        case UP:
+                            addJob(new Job(action, Paths.get(dir).toAbsolutePath(), ns, isNSParent));
+                            break;
+                        case DOWN:
+                            addJob(new Job(action, ns, Paths.get(dir).toAbsolutePath(), isDirParent));
+                            break;
+                        case BOTH:
+                            addJob(new Job(action, Paths.get(dir).toAbsolutePath(), ns, isNSParent));
+                            addJob(new Job(action, ns, Paths.get(dir).toAbsolutePath(), isDirParent));
+                            break;
+                        default:
+                            break;
                         }
                     }
                 }

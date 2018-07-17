@@ -43,10 +43,19 @@ public abstract class SSHCLI<T extends SSHService> implements BackgroundService.
 
     protected void execute(String[] args) throws Throwable {
 
-        MFConnectionSettings mfcs = new MFConnectionSettings(Applications.PROPERTIES_FILE);
+        MFConnectionSettings mfcs = new MFConnectionSettings();
+        mfcs.findAndLoadFromConfigFile();
+        mfcs.loadFromXmlFile(Applications.PROPERTIES_FILE.toFile());
         mfcs.setApp(Applications.APP_NAME);
         for (int i = 0; i < args.length;) {
-            if (args[i].equals("--mf.host")) {
+            if ("--mf.config".equalsIgnoreCase(args[i])) {
+                try {
+                    mfcs.loadFromConfigFile(args[i + 1]);
+                } catch (Throwable e) {
+                    throw new IllegalArgumentException("Invalid --mf.config: " + args[i + 1], e);
+                }
+                i += 2;
+            } else if (args[i].equals("--mf.host")) {
                 mfcs.setServerHost(args[i + 1]);
                 i += 2;
             } else if (args[i].equals("--mf.port")) {
@@ -91,9 +100,13 @@ public abstract class SSHCLI<T extends SSHService> implements BackgroundService.
                 i = parseArgs(args, i);
             }
         }
-        mfcs.validate();
+        // mfcs.checkMissingArguments();
         this.session = new MFSession(mfcs);
-        this.session.testAuthentication();
+        if (mfcs.hasMissingArgument()) {
+            this.session.doConsoleLogon();
+        } else {
+            this.session.testAuthentication();
+        }
         long id = this.service.executeBackground(this.session);
         if (async) {
             System.out.println("Background service ID: " + id);

@@ -471,7 +471,7 @@ public abstract class MFSyncApp extends AbstractMFApp<unimelb.mf.client.sync.set
             @Override
             public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) throws IOException {
                 try {
-                    if (job.matchPath(file)) {
+                    if (job.sourcePathMatches(file)) {
                         files.add(file);
                         if (files.size() >= settings().batchSize()) {
                             // check files
@@ -584,7 +584,7 @@ public abstract class MFSyncApp extends AbstractMFApp<unimelb.mf.client.sync.set
             @Override
             public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) throws IOException {
                 try {
-                    if (job.matchPath(file)) {
+                    if (job.sourcePathMatches(file)) {
                         files.add(file);
                         if (files.size() >= settings().batchSize()) {
                             _queriers.submit(new FileSetUploadTask(session(), logger(), new ArrayList<Path>(files), job,
