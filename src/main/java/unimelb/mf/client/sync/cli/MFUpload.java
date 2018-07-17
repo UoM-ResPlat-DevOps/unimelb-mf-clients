@@ -49,7 +49,7 @@ public class MFUpload extends MFSyncApp {
         System.out.println(String.format("    %s [OPTIONS] --namespace <dst-namespace> <src-dir1> [<src-dir2>...]", PROG));
         System.out.println();
         System.out.println("DESCRIPTION:");
-        System.out.println("    Upload local files to Mediaflux.  Pre-existing files in Mediaflux can be skipped or overwritten. In Daemon mode, the process will only upload new files since the process last executed.");
+        System.out.println("    Upload local files to Mediaflux.  If the file pre-exists in Mediaflux and is the same as that being uploaded, the Mediaflux asset is not modified.  However, if the files are different, then a new version of the asset will be created.   In Daemon mode, the process will only upload new files since the process last executed.");
         System.out.println();
         System.out.println("OPTIONS:");
         System.out.println("    --mf.config <mflux.cfg>                   Path to the config file that contains Mediaflux server details and user credentials.");
@@ -60,7 +60,7 @@ public class MFUpload extends MFSyncApp {
         System.out.println("    --mf.token <token>                        Mediaflux secure identity token.");
 
         System.out.println("    --namespace <dst-namespace>               The destination asset namespace in Mediaflux.");
-        System.out.println("    --csum-check                              Files are equated if the name and size are the same. In addition, with this argument, you can optionally compute the CRC32 checksumk to decide if two files are the same.");
+        System.out.println("    --csum-check                              If enabled, computes the checksum from the uploaded file and compares with that computed by the server for the Mediaflux asset.");
         System.out.println("    --nb-queriers <n>                         Number of query threads. Defaults to " + unimelb.mf.client.sync.settings.Settings.DEFAULT_NUM_OF_QUERIERS);
         System.out.println("    --nb-workers <n>                          Number of concurrent worker threads to download data. Defaults to " + unimelb.mf.client.sync.settings.Settings.DEFAULT_NUM_OF_WORKERS);
         System.out.println("    --nb-retries <n>                          Retry times when error occurs. Defaults to " + unimelb.mf.client.sync.settings.Settings.DEFAULT_MAX_RETRIES);
@@ -71,7 +71,7 @@ public class MFUpload extends MFSyncApp {
         System.out.println("    --log-dir <dir>                           Path to the directory for log files. No logging if not specified.");
         System.out.println("    --notify <email-addresses>                When completes, send email notification to the recipients(comma-separated email addresses if multiple). Not applicable for daemon mode.");
         System.out.println("    --sync-delete-assets                      Delete assets that do not have corresponding local files exist.");
-        System.out.println("    --hard-delete-assets                      Hard destroy assets.");
+        System.out.println("    --hard-delete-assets                      Force the asset deletion (see --sync-delete-assets) process to hard delete assets.  Otherwise, the behaviour is controlled by server properties (whether a deletion is a soft or hard action).");
         System.out.println("    --quiet                                   Do not print progress messages.");
         System.out.println("    --help                                    Prints usage.");
         System.out.println();
