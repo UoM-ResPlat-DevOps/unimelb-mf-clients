@@ -5,7 +5,15 @@ A set of command line utilities to manipulate data in Mediaflux . It consists of
 
 ## I. Utilities (developed by Resplat@UniMelb)
 
-* **mflux.cfg** file: All the **unimelb-mf-** tools and **aterm** tools supports argument **--mf.config** to specify Mediaflux server details and user credentails. See sample [mflux.cfg](https://github.com/UoM-ResPlat-DevOps/unimelb-mf-clients/blob/master/src/main/config/samples/mflux.cfg) file.
+* **mflux.cfg** file:
+  * It is the configuration file for specifying Mediaflux connection details and user credentails. See sample [mflux.cfg](https://github.com/UoM-ResPlat-DevOps/unimelb-mf-clients/blob/master/src/main/config/samples/mflux.cfg) file.
+  * All the command line utitlities below supports it;
+  * To specify the location of **mflux.cfg** file, try one of the approaches below:
+    - put **mflux.cfg** into **$HOME/.Arcitecta/mflux.cfg** if on Unix(Linux/Mac/BSD), or **%userprofile%\.Arcitecta\mflux.cfg** if on Windows.
+    - or set environment variable MFLUX_CFG to be the location of the file before execute the command:
+      * On Unix, `export MFLUX_CFG=/path/to/mflux.cfg` 
+      * On Windows, `setx MFLUX_CFG=X:\path\to\mflux.cfg`
+    - or insert argument `--mf.config /path/to/mflux.cfg` to the command.
 
 ### 1. unimelb-mf-upload
 A command line tool to upload data to Mediaflux.
