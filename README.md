@@ -13,8 +13,10 @@ A set of command line utilities to manipulate data in Mediaflux . It consists of
       * On Unix, save it to **$HOME/.Arcitecta/mflux.cfg** 
       * On Windows, save it to **%userprofile%\.Arcitecta\mflux.cfg**
     - or set environment variable MFLUX_CFG to be the location of the file before execute the command:
-      * On Unix, `export MFLUX_CFG=/path/to/mflux.cfg` 
-      * On Windows, `setx MFLUX_CFG=X:\path\to\mflux.cfg`
+      * On Unix, 
+        - `export MFLUX_CFG=/path/to/mflux.cfg` 
+      * On Windows, 
+        - `setx MFLUX_CFG=X:\path\to\mflux.cfg`
     - or insert argument `--mf.config /path/to/mflux.cfg` to the command.
 
 ### 1. unimelb-mf-upload
