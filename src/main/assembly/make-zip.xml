@@ -25,5 +25,10 @@
 			<directory>src/main/scripts/windows</directory>
 			<outputDirectory>${project.artifactId}-${project.version}/bin/windows</outputDirectory>
 		</fileSet>
+		<fileSet>
+			<fileMode>0644</fileMode>
+			<directory>src/main/config</directory>
+			<outputDirectory>${project.artifactId}-${project.version}/config</outputDirectory>
+		</fileSet>
 	</fileSets>
 </assembly>

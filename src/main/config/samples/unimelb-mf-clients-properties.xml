@@ -75,6 +75,10 @@
 			<!-- source directory -->
 			<directory>/path/to/src-directory1</directory>
             <namespace parent="true">/path/to/dst-parent-ns</namspace>
+   			<!-- Exclude empty directories for uploading -->
+			<excludeEmptyFolder>true</excludeEmptyFolder>
+   			<!-- The filter below excludes all .class files. -->
+			<exclude>**/*.class</exclude>
 		</job>
 		<job action="check-upload">
 			<!-- source directory -->
@@ -86,6 +90,11 @@
 			<directory>/path/to/src-directory2</directory>
 			<!-- destination asset namespace -->
 			<namespace parent="false">/path/to/dst-namespace2</namespace>
+            <!-- inclusive filter. The filter below select all sub-directories' name 
+                 start with wilson under the source directory, and all their descendants. -->
+			<include>wilson*/**</include>
+			<!-- exclusive filter. The filter below excludes all files with name: .DS_store -->
+			<exclude>**/.DS_Store</exclude>
 		</job>
 	</sync>
 </properties>

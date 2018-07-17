@@ -2,7 +2,7 @@
 
 ## I. Utilities (developed by Resplat@UniMelb)
 
-* **mflux.cfg** file: All the **unimelb-mf-** tools and **aterm** tools supports argument **--mf.config** to specify Mediaflux server details and user credentails. See sample [mflux.cfg](https://github.com/UoM-ResPlat-DevOps/unimelb-mf-clients/blob/master/docs/mflux.cfg) file.
+* **mflux.cfg** file: All the **unimelb-mf-** tools and **aterm** tools supports argument **--mf.config** to specify Mediaflux server details and user credentails. See sample [mflux.cfg](https://github.com/UoM-ResPlat-DevOps/unimelb-mf-clients/blob/master/src/main/config/samples/sample_mflux.cfg) file.
 
 ### 1. unimelb-mf-download
 
