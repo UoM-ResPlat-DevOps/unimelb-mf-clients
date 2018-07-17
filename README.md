@@ -1,6 +1,5 @@
 # unimelb-mf-clients
-
-  * **A set of command line utilities to manipulate data in Mediaflux . It consists of tools to upload/download/verify data in Mediaflux system.**
+**A set of command line utilities to manipulate data in Mediaflux . It consists of tools to upload/download/verify data in Mediaflux system.**
 
 ## I. Utilities (developed by Resplat@UniMelb)
 
