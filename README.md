@@ -28,10 +28,6 @@ A command line tool to compare files in local directory with the assets in remot
 **aterm** (or **aterm.cmd** on Windows) is a script provides a command line Mediaflux terminal. Via **aterm** you can execute any Mediaflux service or built-in commands. (e.g. **download**, **import**, **source**)
 * **[Manual for aterm](https://github.com/UoM-ResPlat-DevOps/unimelb-mf-clients/blob/master/docs/aterm.md)**
 
----
-### 2. aterm-download
-**aterm-download** (or **aterm-download.cmd** on Windows) script provides a command line tool to download data from Mediaflux server. 
-* **[Manual for aterm-download](https://github.com/UoM-ResPlat-DevOps/unimelb-mf-clients/blob/master/docs/aterm-download.md)**
 
 
 
