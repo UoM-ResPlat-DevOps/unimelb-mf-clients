@@ -27,11 +27,13 @@ A command line tool to compare files in local directory with the assets in remot
 **aterm** (or **aterm.cmd** on Windows) is a script provides a command line Mediaflux terminal. Via **aterm** you can execute any Mediaflux service or built-in commands. (e.g. **download**, **import**, **source**)
 * **[Manual for aterm](https://github.com/UoM-ResPlat-DevOps/unimelb-mf-clients/blob/master/docs/aterm.md)**
 
+---
 ## III. Configuration
 
-* **Configuration file**
+### Configuration file
 
 **mflux.cfg** file: is the configuration file for specifying Mediaflux connection details and user credentails. See sample [mflux.cfg](https://github.com/UoM-ResPlat-DevOps/unimelb-mf-clients/blob/master/src/main/config/samples/mflux.cfg) file.
+
   * All the command line utitlities above supports it;
   * To specify the location of **mflux.cfg** file, try one of the approaches below:
     - put **mflux.cfg** into the default location:
@@ -44,7 +46,8 @@ A command line tool to compare files in local directory with the assets in remot
         - `setx MFLUX_CFG=X:\path\to\mflux.cfg`
     - or insert argument `--mf.config /path/to/mflux.cfg` to the command.
 
-* **Console interactive login**
+### Console interactive login
+
 All the above utitlites will prompt interactive login in the command line interface, if Mediaflux server details or user credentails are not specified from the configuration file or command arguments.
 
 
