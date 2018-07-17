@@ -4,25 +4,19 @@
 
 * **mflux.cfg** file: All the **unimelb-mf-** tools and **aterm** tools supports argument **--mf.config** to specify Mediaflux server details and user credentails. See sample [mflux.cfg](https://github.com/UoM-ResPlat-DevOps/unimelb-mf-clients/blob/master/src/main/config/samples/mflux.cfg) file.
 
-### 1. unimelb-mf-download
-
-A command line tool to download data from Mediaflux.
-
-* **[Manual for unimelb-mf-download](https://github.com/UoM-ResPlat-DevOps/unimelb-mf-clients/blob/master/docs/unimelb-mf-download.md)**
-
-### 2. unimelb-mf-upload
+### 1. unimelb-mf-upload
 
 A command line tool to upload data to Mediaflux.
 
 * **[Manual for unimelb-mf-upload](https://github.com/UoM-ResPlat-DevOps/unimelb-mf-clients/blob/master/docs/unimelb-mf-upload.md)**
 
-### 3. unimelb-mf-sync
+### 2. unimelb-mf-download
 
-A command line tool to do two-way (upload&download) synchronization between local directory and remote asset namespace in Mediaflux.
+A command line tool to download data from Mediaflux.
 
-* **[Manual for unimelb-mf-sync](https://github.com/UoM-ResPlat-DevOps/unimelb-mf-clients/blob/master/docs/unimelb-mf-sync.md)**
+* **[Manual for unimelb-mf-download](https://github.com/UoM-ResPlat-DevOps/unimelb-mf-clients/blob/master/docs/unimelb-mf-download.md)**
 
-### 4. unimelb-mf-check
+### 3. unimelb-mf-check
 
 A command line tool to compare files in local directory with the assets in remote asset namespace in Mediaflux.
 
