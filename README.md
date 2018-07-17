@@ -1,5 +1,7 @@
 # unimelb-mf-clients
 
+  * **A set of command line utilities to manipulate data in Mediaflux . It consists of tools to upload/download/verify data in Mediaflux system.**
+
 ## I. Utilities (developed by Resplat@UniMelb)
 
 * **mflux.cfg** file: All the **unimelb-mf-** tools and **aterm** tools supports argument **--mf.config** to specify Mediaflux server details and user credentails. See sample [mflux.cfg](https://github.com/UoM-ResPlat-DevOps/unimelb-mf-clients/blob/master/src/main/config/samples/mflux.cfg) file.
