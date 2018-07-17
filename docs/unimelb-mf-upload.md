@@ -3,7 +3,7 @@ USAGE:
     unimelb-mf-upload [OPTIONS] --namespace <dst-namespace> <src-dir1> [<src-dir2>...]
 
 DESCRIPTION:
-    Upload local files to Mediaflux.  Pre-existing files in Mediaflux can be skipped or overwritten. In Daemon mode, the process will only upload new files since the process last executed.
+    Upload local files to Mediaflux.  If the file pre-exists in Mediaflux and is the same as that being uploaded, the Mediaflux asset is not modified.  However, if the files are different, then a new version of the asset will be created.   In Daemon mode, the process will only upload new files since the process last executed.
 
 OPTIONS:
     --mf.config <mflux.cfg>                   Path to the config file that contains Mediaflux server details and user credentials.
@@ -13,7 +13,7 @@ OPTIONS:
     --mf.auth <domain,user,password>          Mediaflux user credentials.
     --mf.token <token>                        Mediaflux secure identity token.
     --namespace <dst-namespace>               The destination asset namespace in Mediaflux.
-    --csum-check                              Files are equated if the name and size are the same. In addition, with this argument, you can optionally compute the CRC32 checksumk to decide if two files are the same.
+    --csum-check                              If enabled, computes the checksum from the uploaded file and compares with that computed by the server for the Mediaflux asset.
     --nb-queriers <n>                         Number of query threads. Defaults to 1
     --nb-workers <n>                          Number of concurrent worker threads to download data. Defaults to 1
     --nb-retries <n>                          Retry times when error occurs. Defaults to 0
@@ -24,7 +24,7 @@ OPTIONS:
     --log-dir <dir>                           Path to the directory for log files. No logging if not specified.
     --notify <email-addresses>                When completes, send email notification to the recipients(comma-separated email addresses if multiple). Not applicable for daemon mode.
     --sync-delete-assets                      Delete assets that do not have corresponding local files exist.
-    --hard-delete-assets                      Hard destroy assets.
+    --hard-delete-assets                      Force the asset deletion (see --sync-delete-assets) process to hard delete assets.  Otherwise, the behaviour is controlled by server properties (whether a deletion is a soft or hard action).
     --quiet                                   Do not print progress messages.
     --help                                    Prints usage.
 
