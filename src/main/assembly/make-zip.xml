@@ -13,6 +13,11 @@
 			<outputDirectory>${project.artifactId}-${project.version}/lib</outputDirectory>
 			<destName>${project.artifactId}.jar</destName>
 		</file>
+		<file>
+			<source>${project.build.directory}/mexplorer-${mexplorer.version}.jar</source>
+			<outputDirectory>${project.artifactId}-${project.version}/lib</outputDirectory>
+			<destName>mexplorer-${mexplorer.version}.jar</destName>
+		</file>
 	</files>
 	<fileSets>
 		<fileSet>

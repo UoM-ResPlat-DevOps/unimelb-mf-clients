@@ -1,0 +1,17 @@
+#!/bin/bash
+  
+# check if java exists
+[[ -z $(which java) ]] && echo "Error: cannot find java." 1>&2 && exit 1
+
+CWD=$(pwd)
+
+BIN=$(dirname ${BASH_SOURCE[0]})
+
+LIB=$(cd ${BIN}/../../lib && pwd)
+
+for f in $(ls -d mexplorer-*.jar && cd ${CWD})
+do
+    JAR=$f
+done
+
+java -jar ${LIB}/${JAR}
