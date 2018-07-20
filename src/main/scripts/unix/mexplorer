@@ -9,9 +9,15 @@ BIN=$(dirname ${BASH_SOURCE[0]})
 
 LIB=$(cd ${BIN}/../../lib && pwd)
 
-for f in $(ls -d mexplorer-*.jar && cd ${CWD})
+cd $LIB
+
+for f in $(ls -d mexplorer-*.jar)
 do
     JAR=$f
 done
+
+[[ -z ${JAR} ]] && echo "Error: cannot find mexplorer-*.jar in ${LIB}" && exit 2
+
+cd $CWD
 
 java -jar ${LIB}/${JAR}
