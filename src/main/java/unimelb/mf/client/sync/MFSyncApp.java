@@ -43,6 +43,7 @@ import unimelb.mf.client.sync.task.SyncDeleteAssetsTask;
 import unimelb.mf.client.sync.task.SyncDeleteFilesTask;
 import unimelb.mf.client.task.AbstractMFApp;
 import unimelb.mf.client.util.MailUtils;
+import unimelb.mf.client.util.TimeUtils;
 
 public abstract class MFSyncApp extends AbstractMFApp<unimelb.mf.client.sync.settings.Settings> implements Runnable {
 
@@ -70,6 +71,8 @@ public abstract class MFSyncApp extends AbstractMFApp<unimelb.mf.client.sync.set
 
     private Long _stimeLast = null;
     private Long _stime = null;
+
+    private Long _execStartTime = null;
 
     protected MFSyncApp() {
         super();
@@ -159,6 +162,9 @@ public abstract class MFSyncApp extends AbstractMFApp<unimelb.mf.client.sync.set
     public void execute() throws Throwable {
 
         preExecute();
+
+        // take down the current system time.
+        _execStartTime = System.currentTimeMillis();
 
         if (!settings().hasJobs()) {
             throw new Exception("No job found!");
@@ -314,6 +320,7 @@ public abstract class MFSyncApp extends AbstractMFApp<unimelb.mf.client.sync.set
     }
 
     protected void printSummary(PrintStream ps) {
+        long durationMillis = System.currentTimeMillis() - _execStartTime;
         List<Job> jobs = settings().jobs();
         if (jobs != null && !jobs.isEmpty()) {
             ps.println();
@@ -348,12 +355,23 @@ public abstract class MFSyncApp extends AbstractMFApp<unimelb.mf.client.sync.set
         }
         ps.println();
         ps.println("Summary:");
+        if (_settings.daemon()) {
+            ps.println(String.format("           Up time: %s", TimeUtils.humanReadableDuration(durationMillis)));
+        } else {
+            ps.println(String.format("         Exec time: %s", TimeUtils.humanReadableDuration(durationMillis)));
+        }
+        ps.println();
         int totalFiles = _nbUploadedFiles.get() + _nbSkippedFiles.get() + _nbFailedFiles.get();
         if (totalFiles > 0) {
             ps.println(String.format("    Uploaded files: %,32d files", _nbUploadedFiles.get()));
             ps.println(String.format("     Skipped files: %,32d files", _nbSkippedFiles.get()));
             ps.println(String.format("      Failed files: %,32d files", _nbFailedFiles.get()));
             ps.println(String.format("    Uploaded bytes: %,32d bytes", _nbUploadedBytes.get()));
+            if (!_settings.daemon()) {
+                // @formatter:off
+                ps.println(String.format("      Upload speed: %,32.3f MB/s", (double) _nbUploadedBytes.get() / 1000.0 / ((double)durationMillis)));
+                // @formatter:on
+            }
             ps.println();
         }
         int deletedAssets = _nbDeletedAssets.get();
@@ -367,6 +385,11 @@ public abstract class MFSyncApp extends AbstractMFApp<unimelb.mf.client.sync.set
             ps.println(String.format("    Skipped assets: %,32d files", _nbSkippedAssets.get()));
             ps.println(String.format("     Failed assets: %,32d files", _nbFailedAssets.get()));
             ps.println(String.format(" Downloaded  bytes: %,32d bytes", _nbDownloadedBytes.get()));
+            if (!_settings.daemon()) {
+                // @formatter:off
+                ps.println(String.format("    Download speed: %,32.3f MB/s", (double) _nbDownloadedBytes.get() / 1000.0 / ((double)durationMillis)));
+                // @formatter:on
+            }
             ps.println();
         }
         int deletedFiles = _nbDeletedFiles.get();
