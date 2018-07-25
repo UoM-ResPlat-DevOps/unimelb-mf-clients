@@ -1,7 +1,6 @@
 package unimelb.mf.client.sync;
 
 import java.io.BufferedReader;
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintStream;
@@ -319,84 +318,93 @@ public abstract class MFSyncApp extends AbstractMFApp<unimelb.mf.client.sync.set
         }
     }
 
-    protected void printSummary(PrintStream ps) {
+    protected String generateSummary() {
+
+        StringBuilder sb = new StringBuilder();
         long durationMillis = System.currentTimeMillis() - _execStartTime;
         List<Job> jobs = settings().jobs();
         if (jobs != null && !jobs.isEmpty()) {
-            ps.println();
+            sb.append("\n");
             if (settings().hasSyncJobs()) {
-                ps.println("Sync:");
+                sb.append("Sync:\n");
                 for (Job job : jobs) {
                     if (job.action() == Action.SYNC) {
-                        ps.println("    src(directory):" + job.directory().toString());
-                        ps.println("    dst(mediaflux):" + job.namespace());
+                        sb.append("    src(directory):" + job.directory().toString()).append("\n");
+                        sb.append("    dst(mediaflux):" + job.namespace()).append("\n");
                     }
                 }
             }
             if (settings().hasDownloadJobs()) {
-                ps.println("Download:");
+                sb.append("Download:\n");
                 for (Job job : jobs) {
                     if (job.action() == Action.DOWNLOAD) {
-                        ps.println("    src(mediaflux):" + job.namespace());
-                        ps.println("    dst(directory):" + job.directory().toString());
+                        sb.append("    src(mediaflux):" + job.namespace()).append("\n");
+                        sb.append("    dst(directory):" + job.directory().toString()).append("\n");
                     }
                 }
             }
             if (settings().hasUploadJobs()) {
-                ps.println("Upload:");
+                sb.append("Upload:\n");
                 for (Job job : jobs) {
                     if (job.action() == Action.UPLOAD) {
-                        ps.println("    src(directory):" + job.directory().toString());
-                        ps.println("    dst(mediaflux):" + job.namespace());
+                        sb.append("    src(directory):" + job.directory().toString()).append("\n");
+                        sb.append("    dst(mediaflux):" + job.namespace()).append("\n");
                     }
                 }
             }
-            ps.println();
+            sb.append("\n");
         }
-        ps.println();
-        ps.println("Summary:");
+        sb.append("\n");
+        sb.append("Summary:\n");
         if (_settings.daemon()) {
-            ps.println(String.format("           Up time: %s", TimeUtils.humanReadableDuration(durationMillis)));
+            sb.append(String.format("           Up time: %s", TimeUtils.humanReadableDuration(durationMillis)))
+                    .append("\n");
         } else {
-            ps.println(String.format("         Exec time: %s", TimeUtils.humanReadableDuration(durationMillis)));
+            sb.append(String.format("         Exec time: %s", TimeUtils.humanReadableDuration(durationMillis)))
+                    .append("\n");
         }
-        ps.println();
+        sb.append("\n");
         int totalFiles = _nbUploadedFiles.get() + _nbSkippedFiles.get() + _nbFailedFiles.get();
         if (totalFiles > 0) {
-            ps.println(String.format("    Uploaded files: %,32d files", _nbUploadedFiles.get()));
-            ps.println(String.format("     Skipped files: %,32d files", _nbSkippedFiles.get()));
-            ps.println(String.format("      Failed files: %,32d files", _nbFailedFiles.get()));
-            ps.println(String.format("    Uploaded bytes: %,32d bytes", _nbUploadedBytes.get()));
+            sb.append(String.format("    Uploaded files: %,32d files", _nbUploadedFiles.get())).append("\n");
+            sb.append(String.format("     Skipped files: %,32d files", _nbSkippedFiles.get())).append("\n");
+            sb.append(String.format("      Failed files: %,32d files", _nbFailedFiles.get())).append("\n");
+            sb.append(String.format("    Uploaded bytes: %,32d bytes", _nbUploadedBytes.get())).append("\n");
             if (!_settings.daemon()) {
                 // @formatter:off
-                ps.println(String.format("      Upload speed: %,32.3f MB/s", (double) _nbUploadedBytes.get() / 1000.0 / ((double)durationMillis)));
+                sb.append(String.format("      Upload speed: %,32.3f MB/s", (double) _nbUploadedBytes.get() / 1000.0 / ((double)durationMillis))).append("\n");
                 // @formatter:on
             }
-            ps.println();
+            sb.append("\n");
         }
         int deletedAssets = _nbDeletedAssets.get();
         if (deletedAssets > 0) {
-            ps.println(String.format("    Deleted Assets: %,32d assets", _nbDeletedAssets.get()));
-            ps.println();
+            sb.append(String.format("    Deleted Assets: %,32d assets", _nbDeletedAssets.get())).append("\n");
+            sb.append("\n");
         }
         int totalAssets = _nbDownloadedAssets.get() + _nbSkippedAssets.get() + _nbFailedAssets.get();
         if (totalAssets > 0) {
-            ps.println(String.format(" Downloaded assets: %,32d files", _nbDownloadedAssets.get()));
-            ps.println(String.format("    Skipped assets: %,32d files", _nbSkippedAssets.get()));
-            ps.println(String.format("     Failed assets: %,32d files", _nbFailedAssets.get()));
-            ps.println(String.format(" Downloaded  bytes: %,32d bytes", _nbDownloadedBytes.get()));
+            sb.append(String.format(" Downloaded assets: %,32d files", _nbDownloadedAssets.get())).append("\n");
+            sb.append(String.format("    Skipped assets: %,32d files", _nbSkippedAssets.get())).append("\n");
+            sb.append(String.format("     Failed assets: %,32d files", _nbFailedAssets.get())).append("\n");
+            sb.append(String.format(" Downloaded  bytes: %,32d bytes", _nbDownloadedBytes.get())).append("\n");
             if (!_settings.daemon()) {
                 // @formatter:off
-                ps.println(String.format("    Download speed: %,32.3f MB/s", (double) _nbDownloadedBytes.get() / 1000.0 / ((double)durationMillis)));
+                sb.append(String.format("    Download speed: %,32.3f MB/s", (double) _nbDownloadedBytes.get() / 1000.0 / ((double)durationMillis))).append("\n");
                 // @formatter:on
             }
-            ps.println();
+            sb.append("\n");
         }
         int deletedFiles = _nbDeletedFiles.get();
         if (deletedFiles > 0) {
-            ps.println(String.format("     Deleted files: %,32d files", _nbDeletedFiles.get()));
-            ps.println();
+            sb.append(String.format("     Deleted files: %,32d files", _nbDeletedFiles.get())).append("\n");
+            sb.append("\n");
         }
+        return sb.toString();
+    }
+
+    protected void printSummary(PrintStream ps) {
+        ps.print(generateSummary());
     }
 
     public void stopDaemon() {
@@ -716,8 +724,15 @@ public abstract class MFSyncApp extends AbstractMFApp<unimelb.mf.client.sync.set
 
     protected void postExecute() {
         if (!settings().hasOnlyCheckJobs()) {
-            printSummary(System.out);
-            notifySummary();
+            String summary = generateSummary();
+            if (settings().logDirectory() != null) {
+                logger().info(summary);
+            } else {
+                System.out.print(summary);
+            }
+            if (settings().hasRecipients()) {
+                notifySummary(summary);
+            }
         }
     }
 
@@ -726,18 +741,12 @@ public abstract class MFSyncApp extends AbstractMFApp<unimelb.mf.client.sync.set
         return _settings;
     }
 
-    public void notifySummary() {
-        ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        PrintStream ps = new PrintStream(baos);
+    public void notifySummary(String summary) {
         try {
-            printSummary(ps);
-            String summary = baos.toString();
             String subject = applicationName() + " results [" + new Date() + "]";
             notify(subject, summary);
         } catch (Throwable e) {
             logger().log(Level.SEVERE, e.getMessage(), e);
-        } finally {
-            ps.close();
         }
     }
 
