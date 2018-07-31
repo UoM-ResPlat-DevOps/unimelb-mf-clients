@@ -23,7 +23,7 @@ public class MFSession {
     public static final int DEFAULT_EXECUTE_RETRY_TIMES = 1;
     public static final int DEFAULT_EXECUTE_RETRY_INTERVAL = 0;
 
-    private MFConnectionSettings _settings;
+    protected MFConnectionSettings settings;
 
     private RemoteServer _rs;
     private AuthenticationDetails _auth;
@@ -31,7 +31,7 @@ public class MFSession {
     private Timer _timer;
 
     public MFSession(MFConnectionSettings settings) {
-        _settings = settings;
+        this.settings = settings;
     }
 
     public synchronized String sessionId() {
@@ -43,13 +43,13 @@ public class MFSession {
     }
 
     public ServerClient.Connection connect() throws Throwable {
-        return connect(_settings.connectRetryTimes());
+        return connect(this.settings.connectRetryTimes());
     }
 
     private synchronized ServerClient.Connection connect(int retryTimes) throws Throwable {
         if (_rs == null) {
-            _rs = new RemoteServer(_settings.serverHost(), _settings.serverPort(), _settings.useHttp(),
-                    _settings.encrypt());
+            _rs = new RemoteServer(this.settings.serverHost(), this.settings.serverPort(), this.settings.useHttp(),
+                    this.settings.encrypt());
             _rs.setConnectionPooling(true);
         }
         ServerClient.Connection cxn = null;
@@ -59,7 +59,7 @@ public class MFSession {
             if (sessionId != null) {
                 cxn.reconnect(sessionId);
             } else {
-                setSessionId(cxn.connect(_auth == null ? _settings.authenticationDetails() : _auth));
+                setSessionId(cxn.connect(_auth == null ? this.settings.authenticationDetails() : _auth));
             }
             if (_auth == null) {
                 _auth = cxn.authenticationDetails();
@@ -68,8 +68,8 @@ public class MFSession {
         } catch (java.net.ConnectException ce) {
             if (retryTimes > 0) {
                 System.out.println("Failed to connect. Retrying ...");
-                if (_settings.connectRetryInterval() > 0) {
-                    Thread.sleep(_settings.connectRetryInterval());
+                if (this.settings.connectRetryInterval() > 0) {
+                    Thread.sleep(this.settings.connectRetryInterval());
                 }
                 return connect(--retryTimes);
             } else {
@@ -87,7 +87,7 @@ public class MFSession {
             ServerClient.Output output, HasAbortableOperation abortable) throws Throwable {
         ServerClient.Connection cxn = connect();
         try {
-            return execute(cxn, service, args, inputs, output, abortable, _settings.executeRetryTimes());
+            return execute(cxn, service, args, inputs, output, abortable, this.settings.executeRetryTimes());
         } finally {
             cxn.close();
         }
@@ -109,32 +109,32 @@ public class MFSession {
         if (console == null) {
             throw new UnsupportedOperationException("Failed to open system console");
         }
-        if (_settings.serverHost() == null) {
-            _settings.readServerHostFromConsole(console);
+        if (this.settings.serverHost() == null) {
+            this.settings.readServerHostFromConsole(console);
         } else {
-            console.printf("Host: %s%n", _settings.serverHost());
+            console.printf("Host: %s%n", this.settings.serverHost());
         }
-        if (_settings.serverPort() <= 0) {
-            _settings.readServerPortFromConsole(console);
+        if (this.settings.serverPort() <= 0) {
+            this.settings.readServerPortFromConsole(console);
         } else {
-            console.printf("Port: %d%n", _settings.serverPort());
+            console.printf("Port: %d%n", this.settings.serverPort());
         }
-        if (_settings.serverTransport() == null) {
-            _settings.readServerTransportFromConsole(console);
+        if (this.settings.serverTransport() == null) {
+            this.settings.readServerTransportFromConsole(console);
         } else {
-            console.printf("Transport: %s%n", _settings.serverTransport());
+            console.printf("Transport: %s%n", this.settings.serverTransport());
         }
-        if (_settings.domain() == null) {
-            _settings.readDomainFromConsole(console);
+        if (this.settings.domain() == null) {
+            this.settings.readDomainFromConsole(console);
         } else {
-            console.printf("Domain: %s%n", _settings.domain());
+            console.printf("Domain: %s%n", this.settings.domain());
         }
-        if (_settings.user() == null) {
-            _settings.readUserFromConsole(console);
+        if (this.settings.user() == null) {
+            this.settings.readUserFromConsole(console);
         } else {
-            console.printf("User: %s%n", _settings.user());
+            console.printf("User: %s%n", this.settings.user());
         }
-        _settings.readPasswordFromConsole(console);
+        this.settings.readPasswordFromConsole(console);
 
         try {
             testAuthentication();
@@ -146,7 +146,7 @@ public class MFSession {
         }
     }
 
-    private XmlDoc.Element execute(ServerClient.Connection cxn, String service, String args,
+    protected XmlDoc.Element execute(ServerClient.Connection cxn, String service, String args,
             List<ServerClient.Input> inputs, ServerClient.Output output, HasAbortableOperation abortable,
             int retryTimes) throws Throwable {
         try {
@@ -171,8 +171,8 @@ public class MFSession {
         } catch (ServerClient.ExSessionInvalid si) {
             if (_auth != null && retryTimes > 0) {
                 System.out.println("Session invalid. Try re-authenticating...");
-                if (_settings.executeRetryInterval() > 0) {
-                    Thread.sleep(_settings.executeRetryInterval());
+                if (this.settings.executeRetryInterval() > 0) {
+                    Thread.sleep(this.settings.executeRetryInterval());
                 }
                 setSessionId(cxn.connect(_auth));
                 return execute(cxn, service, args, inputs, output, abortable, --retryTimes);
@@ -247,7 +247,7 @@ public class MFSession {
     }
 
     public String serverHost() {
-        return _settings.serverHost();
+        return this.settings.serverHost();
     }
 
 }
